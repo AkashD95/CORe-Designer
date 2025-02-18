@@ -1,0 +1,15 @@
+#Ignore fasta files
+*.fa
+
+#Ignoring spec files
+*.spec
+
+#Ignore venv
+venv/
+
+#Ignore test iypnb
+*.iypnb
+
+#Ignore build and dist files in github
+build/
+dist/
