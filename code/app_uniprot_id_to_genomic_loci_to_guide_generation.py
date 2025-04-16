@@ -79,7 +79,45 @@ def extract_genomic_information_from_uniprot_id(uniprot_id):
 
     return genomic_information
 
-def extract_genomic_loci_from_genomic_information(genomic_information, genome_sequence_records, UTR_length=500):
+def recursive_translate(genomic_loci_exons, genomic_information_loci_extracted):
+    # Initial check if "ATG" exists
+    index = genomic_loci_exons.find("ATG")
+    
+    # If "ATG" is not found, return a fail
+    if index == -1:
+        print("ATG not found in the sequence")
+        genomic_information_loci_extracted['translation_check'] = 'Fail'
+        return genomic_information_loci_extracted
+
+    # List to keep track of all ATG positions
+    atg_positions = []
+    while index != -1:
+        atg_positions.append(index)
+        # Search for the next "ATG" after the current index
+        index = genomic_loci_exons.find("ATG", index + 1)
+
+    # Now, iterate through each ATG position and try translating
+    for atg_index in atg_positions:
+        atg_start_sequence = genomic_loci_exons[atg_index:]
+        print(f"Translating from ATG position {atg_index} /coding DNA length({len(atg_start_sequence)})...")
+        print(atg_start_sequence)
+        translation = translate(atg_start_sequence)
+        print(f"Translation length ({len(translation)}): {translation}")
+        # Check if translation matches the expected sequence
+        if translation == genomic_information_loci_extracted['sequence'].iloc[0]:
+            genomic_information_loci_extracted['translation_check'] = 'Pass'
+            print("Translation matched. Marking as 'Pass'.")
+            genomic_information_loci_extracted['loci_exons'] = atg_start_sequence
+            return genomic_information_loci_extracted
+
+        else:
+            print('Translation match failed. Checking next index position.')
+    # If no translation matches after checking all positions, mark as 'Fail'
+    genomic_information_loci_extracted['translation_check'] = 'Fail'
+    print("No matching translation found. Marking as 'Fail'.")
+    return genomic_information_loci_extracted
+
+def extract_genomic_loci_from_genomic_information(genomic_information, genome_sequence_records, UTR_length=1000):
     '''                  
     Takes the output from the Uniprot API from extract_genomic_information_from_uniprot_id function and extracts the genomic loci using a given reference genome. It appends the genomic loci, 
     genomic loci exons and performs a translation check between the protein sequence meta data outputted from extract_genomic_information_from_uniprot_id and the translation of the genomic loci exons
@@ -92,10 +130,10 @@ def extract_genomic_loci_from_genomic_information(genomic_information, genome_se
     genomic_information_loci_extracted (pd.DataFrame): dataframe output with extracted loci, loci_exons and translation checks
     '''
     
-    chromosome_id = genomic_information['gnCoordinate.genomicLocation.chromosome'].iloc[0]
+    print(genomic_information)
+    chromosome_id = str(genomic_information['gnCoordinate.genomicLocation.chromosome'].iloc[0])
     records_dict = {seq.id: seq for seq in genome_sequence_records}
     match = records_dict.get(chromosome_id)
-    
     if match:
         is_reverse_strand = str(genomic_information['gnCoordinate.genomicLocation.reverseStrand'].iloc[0]) == 'True'
         uniprot_start = int(genomic_information['gnCoordinate.genomicLocation.start'].iloc[0])
@@ -104,10 +142,7 @@ def extract_genomic_loci_from_genomic_information(genomic_information, genome_se
         # Adjust start and end for reverse strand
         if is_reverse_strand:
             uniprot_start, uniprot_end = uniprot_end, uniprot_start
-        
-        extracted_gene = match.seq[uniprot_start - UTR_length - 1:uniprot_end + UTR_length].lower()
-        extracted_gene = str(extracted_gene)
-        
+           
         # Preparing exons DataFrame by splitting on commas
         df_exons_id = genomic_information[['exon_id']].copy()
         df_exons_id['exon_id'] = df_exons_id['exon_id'].str.split(',')
@@ -129,20 +164,35 @@ def extract_genomic_loci_from_genomic_information(genomic_information, genome_se
         if is_reverse_strand:
             df_exons['exon_start'], df_exons['exon_end'] = df_exons['exon_end'], df_exons['exon_start']
         
+        extracted_gene = match.seq[(uniprot_start - 1) - UTR_length:(uniprot_end - 1) + UTR_length].lower()
+        extracted_gene = str(extracted_gene)
+        print(f'Extracted gene (length:{len(extracted_gene)}):')
+        print(extracted_gene)
+
         # Convert each exon sequence to uppercase in the extracted gene sequence
         for _, row in df_exons.iterrows():
-            exon_start = int(row['exon_start'])
-            exon_end = int(row['exon_end'])
-            exon = str(match.seq[exon_start - 1:exon_end].lower())
-            exon_start_index = extracted_gene.find(exon)
+            if row['exon_start'] != 'nan' and row['exon_end']!= 'nan':
+                exon_start = int(float(row['exon_start'])) - uniprot_start + UTR_length
+                print("Exon start:")
+                print(exon_start)
+                exon_end = int(float(row['exon_end'])) - uniprot_start + UTR_length
+                print("Exon end:")
+                print(exon_end)
+            else:
+                exon_start = exon_end = 0
+                
+            extracted_exon = extracted_gene[exon_start:exon_end+1]
+            print('Extracted exon:')
+            print(extracted_exon)
             
-            if exon_start_index != -1:
-                exon_end_index = exon_start_index + len(exon)
-                extracted_gene = (
-                    extracted_gene[:exon_start_index]
-                    + extracted_gene[exon_start_index:exon_end_index].upper()
-                    + extracted_gene[exon_end_index:]
+            extracted_gene = (
+                    extracted_gene[:exon_start]
+                    + extracted_exon.upper()
+                    + extracted_gene[exon_end+1:]
                 )
+            
+            print('Extracted gene:')
+            print(extracted_gene)
         
         if is_reverse_strand:
             annotated_gene = reverse_complement(extracted_gene)
@@ -152,16 +202,30 @@ def extract_genomic_loci_from_genomic_information(genomic_information, genome_se
         genomic_loci, genomic_loci_exons = clean_loci(annotated_gene)
         genomic_information_loci_extracted = genomic_information.assign(genomic_loci=genomic_loci, genomic_loci_exon=genomic_loci_exons)
         
-        # Translate the extracted loci exons and match them against the uniprot sequence 
-        translation = translate(genomic_loci_exons)
-        if translation == genomic_information_loci_extracted['sequence'].iloc[0]:
-            genomic_information_loci_extracted = genomic_information_loci_extracted.assign(translation_check='Pass')
-        else:
-            genomic_information_loci_extracted = genomic_information_loci_extracted.assign(translation_check='Fail')
-    
-    return genomic_information_loci_extracted
+        #Print reference loci and amino acid sequence 
+        print(f'Genomic loci exons (length = {len(genomic_loci_exons)})')
+        print(genomic_loci_exons)
+        print(f"Reference amino acid sequence (length = {len(genomic_information_loci_extracted['sequence'].iloc[0])}):")
+        print(genomic_information_loci_extracted['sequence'].iloc[0])
 
-#guide generation for specific amino acid
+        # Translate the extracted loci exons and match them against the uniprot sequence 
+        if genomic_loci_exons.startswith("ATG"):
+            translation = translate(genomic_loci_exons)
+            print('Translating exons...')
+            print(translation)
+            if translation == genomic_information_loci_extracted['sequence'].iloc[0]:
+                genomic_information_loci_extracted = genomic_information_loci_extracted.assign(translation_check='Pass')
+                print('Translation matches protein sequence:')
+                return genomic_information_loci_extracted
+            else:
+                genomic_information_loci_extracted = genomic_information_loci_extracted.assign(translation_check='Fail')   
+                print('Translation does not match protein sequence (running string search as possible fix):')
+                return genomic_information_loci_extracted
+        else:
+            genomic_information_loci_extracted = recursive_translate(genomic_loci_exons, genomic_information_loci_extracted)
+            return genomic_information_loci_extracted
+
+# guide generation for specific amino acid
 def find_guides(loci, pam):
     """ 
     Finds guide RNA sequences on the positive and negative strands of the loci by 
@@ -172,14 +236,14 @@ def find_guides(loci, pam):
         pam - protospacer adjacent motif for Cas protein
         
     Returns:
-        pam_start_position - position of pam start site (adjusted for python 0 indexing)
+        crRNA_DNA_start_position - position of crRNA_DNA start site (adjusted for python 0 indexing)
         crRNA_DNA_sequence - sequence 20bp upstream of PAM
         strand - which strand PAM was found on (positive or negative)
     """
     
     # Initialize lists to store gRNA information
     pam_found = []
-    pam_start_position = []
+    crRNA_DNA_sequence_start_position = []
     crRNA_DNA_sequence = []
     strand = []
     
@@ -191,8 +255,8 @@ def find_guides(loci, pam):
             if (loci[n] in ['A','a','T','t','C','c','G','g'] and loci[n+1] in ['G','g'] and loci[n+2] in ['G','g']):
                 if n - 21 >= 0:  # Ensure there are enough bases before the PAM
                     pam_found.append(loci[n:n+3])
-                    pam_start_position.append(n) # pam start site
-                    crRNA_DNA_sequence.append(loci[n-21:n])  # Extract sequence (adjusted for python 0 indexing and python slicing being non inclusive of the final value)
+                    crRNA_DNA_sequence_start_position.append(n) # crRNA DNA sequence start site
+                    crRNA_DNA_sequence.append(loci[n-20:n])  # Extract sequence (adjusted for python 0 indexing and python slicing being non inclusive of the final value)
                     strand.append("forward")
         
         print(f'Searching reverse strand for {pam} sites...')
@@ -202,14 +266,14 @@ def find_guides(loci, pam):
             if (loci_reverse_complement[n] in ['A','a','T','t','C','c','G','g'] and loci_reverse_complement[n+1] in ['G','g'] and loci_reverse_complement[n+2] in ['G','g']):
                 if n - 21 >= 0:  # Ensure there are enough bases before the PAM
                     pam_found.append(loci_reverse_complement[n:n+3])
-                    pam_start_position.append(len(loci) - (n))  #pam start site
-                    crRNA_DNA_sequence.append(loci_reverse_complement[n-21:n])  # Extract sequence
+                    crRNA_DNA_sequence_start_position.append(len(loci) - (n))  #crRNA DNA sequence start site
+                    crRNA_DNA_sequence.append(loci_reverse_complement[n-20:n])  # Extract sequence
                     strand.append("reverse")
                     
     else:
         raise ValueError("PAM not recognised")
 
-    return pam_found, pam_start_position, crRNA_DNA_sequence, strand
+    return pam_found, crRNA_DNA_sequence_start_position, crRNA_DNA_sequence, strand
 
 #get codon index function
 def get_codon_index(loci, loci_exon):
@@ -294,22 +358,21 @@ def guide_RNA_notes(grna_dna_sequence, gc_percentage):
         notes.append('G/C content over 75%.') #Check if the G/C content of the guide is more than or equal to 75%
     return notes
 
-def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, minimum_distance = 30, maximum_distance = 60, pam = 'NGG'):
+def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, minimum_distance = 5, maximum_distance = 86, pam = 'NGG', ):
     """ 
     Identifies and produces metrics for guides upstream and downstream from a specific amino acid residue.
     
     Arguments:
         spec_aa_pos - specific amino acid residue selected by position
+        loci - DNA loci for protein of interest 
+        reference_genome - reference genome used
         minimum_distance - minimum search distance to find guide RNA (in bases pairs from the codon for the specific amino acid)
         minimum_distance - maximum search distance to find guide RNA (in bases pairs from the codon for the specific amino acid)
         pam - pam sequence e.g. NGG for spCas9
-        loci - DNA loci for protein of interest 
-        reference genome - reference genome (used for for off target metrics)
         
-        
+            
     Returns:
         guides (pd.Dataframe): pandas dataframe containing information about all guide pairs
-    
     """
   
     loci, loci_exon = clean_loci(loci)
@@ -324,21 +387,22 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     # display information about the selected amino acid
     spec_aa_pos = int(spec_aa_pos)
     maximum_distance = int(maximum_distance)
-    aa_selected = protein_dict[spec_aa_pos - 1]
+    aa_selected = protein_dict[spec_aa_pos - 1] #-1 corrects for python 0 indexing
     # Confirm the selection is the correct amino acid
     print(f'The amino acid you have selected is {aa_selected} at aa position {spec_aa_pos} and loci postion {protein_dict[spec_aa_pos - 1]["base_1"][0]} - {protein_dict[spec_aa_pos - 1]["base_3"][0]}')  
     print(f'The PAM you have selected is {pam}')
     
-    # generate lists of all the potential guides within the genomic loci and a list of all guides on the reverse complement.
-    loci_region_start = protein_dict[spec_aa_pos - 1]["base_1"][0] - 2*maximum_distance
-    loci_region_end = protein_dict[spec_aa_pos - 1]["base_3"][0] + 2*maximum_distance
-    loci_region = loci[loci_region_start:loci_region_end]
+    # generate lists of all the potential guides within a subsection genomic loci and a list of all guides on the reverse complement.
+    loci_region_start = protein_dict[spec_aa_pos - 1]["base_1"][0] - maximum_distance - 25
+    loci_region_end = protein_dict[spec_aa_pos - 1]["base_3"][0] + maximum_distance + 25
+    loci_search_region = loci[loci_region_start:loci_region_end] # Make a smaller region of the loci for loci off target checking + easier visualisation
     print(f'Searching for gRNAs in loci region {loci_region_start}-{loci_region_end}...')
-    print(loci_region)
-
     
+    #loci check region for appending onto output dataframe for easy checks and to be used in the 
+    loci_check_region = loci[protein_dict[spec_aa_pos - 1]["base_1"][0] - 1000: protein_dict[spec_aa_pos - 1]["base_3"][0] + 1000]
+
     # Identify PAMs in the inputted genomic loci
-    pam_found , guide_positions, gRNA_list, guide_strands = find_guides(loci_region, pam)  
+    pam_found , guide_positions, gRNA_list, guide_strands = find_guides(loci_search_region, pam)  
     
     # convert the lists into dataframes
     guide_df = pd.DataFrame()
@@ -347,7 +411,7 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     guide_df["PAM"] = pam_found
     
     # Add a column of guide RNA sequences to the dataframe
-    guide_df["Full gRNA Sequence"] = gRNA_list  
+    guide_df["gRNA variable region sequence"] = gRNA_list  
     
     # Add a column of guide RNA cut site positions to the dataframe
     guide_df["Position on + strand"] = guide_positions + loci_region_start
@@ -363,16 +427,18 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     
     print(f'{(len(guide_df))} guides found')
     
-   # get the distance of the gRNAs from the start and end base of the amino acid
-    start_base = protein_dict[spec_aa_pos - 1]["base_1"][0] #correct for python 0 index
-    end_base = protein_dict[spec_aa_pos - 1]["base_3"][0] #correct for python 0 index
+   #get the distance of the gRNAs from the start and end base of the amino acid
+    start_base = protein_dict[spec_aa_pos - 1]["base_1"][0] # -1 corrects for python 0 index
+    print(start_base)
+    end_base = protein_dict[spec_aa_pos - 1]["base_3"][0] # -1 corrects for python 0 index
+    print(end_base)
     guide_df["Distance from start of Amino Acid (bp)"] = guide_df["Position on + strand"] - start_base
-    guide_df["Distance from end of Amino Acid (bp)"] = guide_df["Position on + strand"] - end_base
-    
-    print('guide_df')
+    guide_df["Distance from end of Amino Acid (bp)"] = guide_df["Position on + strand"] - end_base - 1 # -1 ensures that distances are not inclusive of the end base
+  
+  
 
     # define a dataframe for if there are no guides within the distance range
-    noguides = pd.DataFrame(columns=["PAM","Full gRNA Sequence","Position on + strand","Strand","Distance from Amino Acid (bp)"])  
+    noguides = pd.DataFrame(columns=["loci_region","PAM","gRNA variable region sequence","Position on + strand","Strand","Distance from Amino Acid (bp)"])  
        
     # get the upstream guide RNA dataframe
     upstream_guides = []
@@ -395,7 +461,9 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     
     if len(downstream_guides) == 0:
         downstream_guides = noguides
-    
+        guides = pd.concat([upstream_guides,downstream_guides])
+        return guides
+
     # join the dataframes together
     guides = pd.concat([upstream_guides,downstream_guides])
     guides = guides.reset_index(drop = True)
@@ -403,8 +471,8 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     # get the G/C content
     guides["G/C Content (%)"] = guides.apply(
         lambda row: (
-            get_GC_content(row["Full gRNA Sequence"])
-            if row["Full gRNA Sequence"] != ""
+            get_GC_content(row["gRNA variable region sequence"])
+            if row["gRNA variable region sequence"] != ""
             else ""
         ),
         axis=1
@@ -412,8 +480,8 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     # get the notes
     guides["Notes"] = guides.apply(
         lambda row: (
-            guide_RNA_notes(row["Full gRNA Sequence"], row["G/C Content (%)"])
-            if row["Full gRNA Sequence"] != ""
+            guide_RNA_notes(row["gRNA variable region sequence"], row["G/C Content (%)"])
+            if row["gRNA variable region sequence"] != ""
             else ""
         ),
         axis=1
@@ -421,122 +489,36 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     
     # Perform off target searches
     guides["off target count (loci)"] = guides.apply(
-    lambda row: loci.count(row['Full gRNA Sequence'] + row['PAM']) + 
-                 loci.count(reverse_complement(row['Full gRNA Sequence'] + row['PAM'])) - 1,  
+    lambda row: loci.count(row['gRNA variable region sequence'] + row['PAM']) + 
+                 loci.count(reverse_complement(row['gRNA variable region sequence'] + row['PAM'])) - 1,  
     axis=1
 )
     guides["off target count (genome)"] = guides.apply(
         lambda row: sum(
-            record.seq.count((row['Full gRNA Sequence'] + row['PAM']).upper()) +
-            record.seq.count(reverse_complement((row['Full gRNA Sequence'] + row['PAM'] ).upper()))
+            record.seq.count((row['gRNA variable region sequence'] + row['PAM']).upper()) +
+            record.seq.count(reverse_complement((row['gRNA variable region sequence'] + row['PAM'] ).upper()))
             for record in reference_genome
         ) - 1,  # Adjusting for the self-match if necessary
         axis=1
     )
+    
+    # Add a column for loci_region
+    guides["loci_region"] = str(loci_check_region)
     # Reorganise the guide RNA dataframe
     guides = guides[
         [
             "PAM",
             "Distance from Amino Acid (bp)",
-            "Full gRNA Sequence",
+            "gRNA variable region sequence",
             "Position on + strand",
             "Strand",
             "G/C Content (%)",
             "off target count (loci)",
             "off target count (genome)",
             "Notes",
+            "loci_region"
         ]
     ]
     guides = guides.reset_index(drop = True)
     
     return guides
-
-
-# Below is the work for the batch version as a shell script so in can be run on clusters. TO DO
-# Setup logger
-# logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-# logger = logging.getLogger(__name__)
-
-# def parse_arguments():
-#     """
-#     Parses command-line arguments.
-#     :return: Parsed arguments as an argparse.Namespace object
-#     """
-#     parser = argparse.ArgumentParser()
-
-#     parser.add_argument(
-#         "-i", "--uniprot_ID", 
-#         required=True, 
-#         type=str,
-#         help="input Uniprot ID"
-#     )
-    
-#     parser.add_argument(
-#         "-gi", "--genome", 
-#         required=True, 
-#         type=str,
-#         help="Path to reference genome file"
-#     )
-    
-#     parser.add_argument(
-#         "-o", "--output", 
-#         required=True, 
-#         type=str,
-#         help="Path to the output dataframe file"
-#     )
-    
-#     parser.add_argument(
-#         "-v", "--verbose", 
-#         action="store_true", 
-#         help="Enable verbose logging"
-#     )
-
-#     return parser.parse_args()
-
-# def main(args):
-#     """
-#     Main function to run the primary logic of the script.
-#     :param args: Parsed command-line arguments
-#     """
-#     # Enable verbose logging if specified
-#     if args.verbose:
-#         logger.setLevel(logging.DEBUG)
-#         logger.debug("Verbose logging enabled.")
-
-#     # "Hello, World!" functionality with input and output files
-#     logger.info("Starting main script...")
-
-#     # Read from input file
-#     try:
-#         aa_position, aa_names, aa_xyz, aa_pldtt = extract_alpha_carbons(args.input)
-#         logger.debug('extracting alpha carbon coordinates')
-        
-#         distance_matrix = calculate_distance_matrix(aa_xyz)
-#         logger.debug('generating distance matrix')
-
-#         metadata_list = list(zip(aa_position, aa_names, aa_pldtt))
-#         logger.debug('generating metadata list')
-
-#         # Write to output file
-#         np.savetxt(args.output, distance_matrix, delimiter=",", fmt="%.1f")
-#         logger.info(f"Processing complete. Output saved to {args.output}")
-
-#         np.savetxt(args.meta_output, metadata_list, delimiter=",", fmt = '%s')
-#         logger.info(f"Processing complete. Output saved to {args.output}")
-
-#     except FileNotFoundError:
-#         logger.error(f"Input file {args.input} not found.")
-#         sys.exit(1)
-#     except Exception as e:
-#         logger.error(f"An error occurred: {e}")
-#         sys.exit(1)
-
-# if __name__ == "__main__":
-#     # Parse arguments
-#     args = parse_arguments()
-
-#     try:
-#         main(args)
-#     except Exception as e:
-#         logger.error(f"An error occurred in the main function: {e}")
-#         sys.exit(1)

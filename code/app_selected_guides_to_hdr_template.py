@@ -34,11 +34,23 @@ def generate_hdr_template(loci, upstream_guide_position, downstream_guide_positi
     
     return hdr_template, upstream_homology_arm,upstream_homology_arm_start, upstream_homology_arm_end, downstream_homology_arm, downstream_homology_arm_start, downstream_homology_arm_end
 
-def recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_distance):
+def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_guide_distance):
     """
-    Recodonise dna sequence to most abundant codons but not changing protein sequence
+    Recodonise hdr template to codon with nearest amino acid frequency.
+    Arguments: 
+    hdr_template(str): hdr template sequence to be used used as the template for recodonisation
+    upstream_guide_distance (int): distance from start of upstream guide RNA to the start of the codon for the amino acid of interest
+    downstream_guide_distance (int): distance from the start of the downstream guide RNA to the end of the codon for the amino acid of interest
+    
+    Returns: 
+    recodonised_hdr_template(str): recodonised template sequence to be used base template for hdr library generation
+    spec_aa_codon_start (int): 
+    recodonisation_check (str)
+
     """
-    # Dictionaries required for function
+
+    # 3 dictionaries to be used by the function
+    # codon_dict pairs each codon to the corresponding amino acid
     codon_dict = {
     'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
     'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R', 'AGA': 'R', 'AGG': 'R',
@@ -52,7 +64,7 @@ def recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_
     'ATT': 'I', 'ATC': 'I', 'ATA': 'I',
     'TTA': 'L', 'TTG': 'L', 'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
     'AAA': 'K', 'AAG': 'K',
-    'ATG': 'M',  # Also the start codon
+    'ATG': 'M',  
     'TTT': 'F', 'TTC': 'F',
     'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
     'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S', 'AGT': 'S', 'AGC': 'S',
@@ -63,6 +75,7 @@ def recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_
     'TAA': '*', '*': '*', 'TGA': '*'
     }
 
+    #aa_to_codon pairs each amino acid to a codon
     aa_to_codon = {
     'I': ['ATA', 'ATC', 'ATT'], # Isoleucine
     'M': ['ATG'], # Methionine
@@ -85,142 +98,148 @@ def recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_
     'C': ['TGC', 'TGT'], #Cysteine
     'W': ['TGG'], #Tryptophan
     '*': ['TAA', 'TAG', 'TGA']  # Stop codons
+}
+    # human frequency dict pairs each codon to a it frequence usage using the codon frequency table found at. 
+    human_frequency_dict = {
+        # Isoleucine (Ile)
+        'ATA': 0.16,
+        'ATC': 0.48,
+        'ATT': 0.36,
+        
+        # Methionine (Met)
+        'ATG': 1.00,  
+        
+        # Threonine (Thr)
+        'ACA': 0.28,
+        'ACC': 0.36,
+        'ACG': 0.12,
+        'ACT': 0.24,
+        
+        # Asparagine (Asn)
+        'AAC': 0.54,
+        'AAT': 0.46,
+        
+        # Lysine (Lys)
+        'AAA': 0.42,
+        'AAG': 0.58,
+        
+        # Serine (Ser)
+        'AGC': 0.24,
+        'AGT': 0.15,
+        
+        # Arginine (Arg)
+        'AGA': 0.20,
+        'AGG': 0.20,
+        
+        # Leucine (Leu)
+        'CTA': 0.07,
+        'CTC': 0.20,
+        'CTG': 0.41,
+        'CTT': 0.13,
+        
+        # Proline (Pro)
+        'CCA': 0.27,
+        'CCC': 0.33,
+        'CCG': 0.11,
+        'CCT': 0.28,
+        
+        # Histidine (His)
+        'CAC': 0.59,
+        'CAT': 0.41,
+        
+        # Glutamine (Gln)
+        'CAA': 0.25,
+        'CAG': 0.75,
+        
+        # Arginine (Arg)
+        'CGA': 0.11,
+        'CGC': 0.19,
+        'CGG': 0.21,
+        'CGT': 0.08,
+        
+        # Valine (Val)
+        'GTA': 0.11,
+        'GTC': 0.24,
+        'GTG': 0.47,
+        'GTT': 0.18,
+        
+        # Alanine (Ala)
+        'GCA': 0.23,
+        'GCC': 0.40,
+        'GCG': 0.11,
+        'GCT': 0.26,
+        
+        # Aspartic acid (Asp)
+        'GAC': 0.54,
+        'GAT': 0.46,
+        
+        # Glutamic acid (Glu)
+        'GAA': 0.42,
+        'GAG': 0.58,
+        
+        # Glycine (Gly)
+        'GGA': 0.25,
+        'GGC': 0.34,
+        'GGG': 0.25,
+        'GGT': 0.16,
+        
+        # Serine (Ser)
+        'TCA': 0.15,
+        'TCC': 0.22,
+        'TCG': 0.06,
+        'TCT': 0.18,
+        
+        # Phenylalanine (Phe)
+        'TTC': 0.55,
+        'TTT': 0.45,
+        
+        # Leucine (Leu)
+        'TTA': 0.07,
+        'TTG': 0.13,
+        
+        # Tyrosine (Tyr)
+        'TAC': 0.57,
+        'TAT': 0.43,
+        
+        # Cysteine (Cys)
+        'TGC': 0.55,
+        'TGT': 0.45,
+        
+        # Tryptophan (Trp)
+        'TGG': 1.00,
+        
+        # Stop (*)
+        'TAA': 0.61,
+        'TAG': 0.09,
+        'TGA': 0.30
     }
 
-    human_frequency_dict = {
-    # Isoleucine (Ile)
-    'ATA': 0.16,
-    'ATC': 0.48,
-    'ATT': 0.36,
     
-    # Methionine (Met)
-    'ATG': 1.00,  
-    
-    # Threonine (Thr)
-    'ACA': 0.28,
-    'ACC': 0.36,
-    'ACG': 0.12,
-    'ACT': 0.24,
-    
-    # Asparagine (Asn)
-    'AAC': 0.54,
-    'AAT': 0.46,
-    
-    # Lysine (Lys)
-    'AAA': 0.42,
-    'AAG': 0.58,
-    
-    # Serine (Ser)
-    'AGC': 0.24,
-    'AGT': 0.15,
-    
-    # Arginine (Arg)
-    'AGA': 0.20,
-    'AGG': 0.20,
-    
-    # Leucine (Leu)
-    'CTA': 0.07,
-    'CTC': 0.20,
-    'CTG': 0.41,
-    'CTT': 0.13,
-    
-    # Proline (Pro)
-    'CCA': 0.27,
-    'CCC': 0.33,
-    'CCG': 0.11,
-    'CCT': 0.28,
-    
-    # Histidine (His)
-    'CAC': 0.59,
-    'CAT': 0.41,
-    
-    # Glutamine (Gln)
-    'CAA': 0.25,
-    'CAG': 0.75,
-    
-    # Arginine (Arg)
-    'CGA': 0.11,
-    'CGC': 0.19,
-    'CGG': 0.21,
-    'CGT': 0.08,
-    
-    # Valine (Val)
-    'GTA': 0.11,
-    'GTC': 0.24,
-    'GTG': 0.47,
-    'GTT': 0.18,
-    
-    # Alanine (Ala)
-    'GCA': 0.23,
-    'GCC': 0.40,
-    'GCG': 0.11,
-    'GCT': 0.26,
-    
-    # Aspartic acid (Asp)
-    'GAC': 0.54,
-    'GAT': 0.46,
-    
-    # Glutamic acid (Glu)
-    'GAA': 0.42,
-    'GAG': 0.58,
-    
-    # Glycine (Gly)
-    'GGA': 0.25,
-    'GGC': 0.34,
-    'GGG': 0.25,
-    'GGT': 0.16,
-    
-    # Serine (Ser)
-    'TCA': 0.15,
-    'TCC': 0.22,
-    'TCG': 0.06,
-    'TCT': 0.18,
-    
-    # Phenylalanine (Phe)
-    'TTC': 0.55,
-    'TTT': 0.45,
-    
-    # Leucine (Leu)
-    'TTA': 0.07,
-    'TTG': 0.13,
-    
-    # Tyrosine (Tyr)
-    'TAC': 0.57,
-    'TAT': 0.43,
-    
-    # Cysteine (Cys)
-    'TGC': 0.55,
-    'TGT': 0.45,
-    
-    # Tryptophan (Trp)
-    'TGG': 1.00,
-    
-    # Stop (*)
-    'TAA': 0.61,
-    'TAG': 0.09,
-    'TGA': 0.30
-    }
-    
-    #Check in hdr_template_exon is in frame and shift start point of recodonisation to be in frame
+  
+    #First check that the hdr_template_exon is in frame and shift start point of recodonisation to be in frame
     #this is done by identifying the target codon and frameshifting to that reference
     hdr_template, hdr_template_exon = clean_loci(hdr_template)
     spec_aa_codon_start = 0 + abs(upstream_guide_distance)
     spec_aa_codon_end = len(hdr_template) - downstream_guide_distance
-    print(spec_aa_codon_end)
-    spec_aa_codon = hdr_template[spec_aa_codon_start:spec_aa_codon_end+1]
+    
+    spec_aa_codon = hdr_template[spec_aa_codon_start:spec_aa_codon_end]
     print(f'hdr template(length:{len(hdr_template)})')
     print(hdr_template)
     
     print(f'hdr template exon (length:{len(hdr_template_exon)})')
     print(hdr_template_exon)
     
-    print(f'Target codon is at position: {spec_aa_codon_start} - {spec_aa_codon_end}')
-    print(f'{spec_aa_codon}:{translate(spec_aa_codon)}')
+    print(f'Target codon is at position: {spec_aa_codon_start} - {spec_aa_codon_end - 1}')
+    print(spec_aa_codon)
     
-    # Correct spec_aa_codon_start and end for possible introns
+    print('Translation')
+    print(f'{translate(spec_aa_codon)}')
+
+    #Correct spec_aa_codon_start and end for possible introns and the start and the end
     exon_start_index = next((i for i, char in enumerate(hdr_template) if char.isupper()), -1)
     spec_aa_codon_start_exon_corrected = spec_aa_codon_start - exon_start_index
 
+    
     if spec_aa_codon_start_exon_corrected % 3 == 0:
         print('Exons are in frame')
         n = 0
@@ -235,10 +254,11 @@ def recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_
     aa_sequence = ""
     hdr_template_exon_dict = {}
     exon_start_index = next((i for i, char in enumerate(hdr_template) if char.isupper()), -1)
-    for i in range(n, len(hdr_template_exon)-3, 3):
+    for i in range(n, len(hdr_template_exon)-2, 3):
         codon_start = i
         codon_end = i+3
         codon = hdr_template_exon[codon_start:codon_end]
+        print(codon)
         aa = codon_dict[codon]
         aa_sequence += aa
         hdr_template_exon_dict[i // 3] = codon
@@ -257,6 +277,7 @@ def recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_
         if aa in ['M', "W", "*"]:
             recodonised_sequence += current_codon
         else:
+            #print(aa, current_codon)
             aa_dict = {codon : human_frequency_dict[codon] for codon in aa_to_codon[aa]}
             codon_freq_list = sorted(aa_dict.items(), key=lambda x: x[1], reverse=True)
             for i, codon_freq in enumerate(codon_freq_list):
@@ -300,3 +321,102 @@ def recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_
         
     # return the recodonized sequence
     return hdr_template_recodonised, spec_aa_codon_start, recodonisation_check
+
+def reconstruct_loci_with_recodonised_hdr_template(loci, hdr_template_recodonised, upstream_homology_arm_end, downstream_homology_arm_start):
+    '''
+    This function integrates the recodonised hdr template back into the loci. 
+
+    Args:
+    loci (str): Genomic loci that the guides were generated from. 
+    hdr_template_recodonised (str): hdr template recodonised to be synonymouse to the wild type 
+    upstream_homology_arm_end (int): position in the loci of the end of the upstream homology arm
+    downstream_homology_arm_start (int): position in the loci of the start of the downstream homology arm
+
+    Returns:
+    section_loci_plus_recodonised_hdr_template (str): Section of the loci with the recodonised hdr template integrated. Used for visual inspection and automated primer design
+    '''
+    upstream_loci = loci[0:int(upstream_homology_arm_end)]
+    downstream_loci = loci[int(downstream_homology_arm_start)::]
+    
+    loci_plus_recodonised_hdr_template = upstream_loci + hdr_template_recodonised + downstream_loci
+    print('Full loci with recodonised HDR template integrated:')
+    print(loci_plus_recodonised_hdr_template)
+
+    if len(loci) == len(loci_plus_recodonised_hdr_template):
+        print(f'Reconstruction successful -> loci ({len(loci)}) equals loci with hdr template integrated ({len(loci_plus_recodonised_hdr_template)})')
+        
+        section_loci_plus_recodonised_hdr_template = loci_plus_recodonised_hdr_template[int(upstream_homology_arm_end) - 1000:int(downstream_homology_arm_start) + 1000]
+        print('Section of loci with recodonised HDR template integrated:')
+        print(section_loci_plus_recodonised_hdr_template)
+        
+        return loci_plus_recodonised_hdr_template, section_loci_plus_recodonised_hdr_template
+    else:
+        print(f'Reconstruction failed -> loci ({len(loci)}) not equal to loci with hdr template integrated ({len(loci_plus_recodonised_hdr_template)})')
+        return
+    
+def generate_hdr_library(recodonised_hdr_template, spec_aa_codon_start, upstream_homology_arm, downstream_homology_arm, variant_specific = None, codon_list = [('I', 'ATC'), ('M', 'ATG'), ('T', 'ACC'), ('N', 'AAC'), ('K', 'AAG'), ('S', 'AGC'), ('R', 'CGG'), ('L', 'CTG'), ('P', 'CCC'), ('H', 'CAC'), ('Q', 'CAG'), ('V', 'GTG'), ('A', 'GCC'), ('D', 'GAC'), ('E', 'GAG'), ('G', 'GGC'), ('F', 'TTC'), ('Y', 'TAC'), ('C', 'TGC'), ('W', 'TGG'), ('*', 'TAA')]):
+        '''
+        Replaces a codon at a given index
+        Arguments:
+        hdr_template (str) - homologous directed repair template 
+        spec_aa_codon_start (int) - start index of codon to be replaced 
+        list_of_codons for library (str) - list of codons for library. Default is max frequencies for all 20 amino acids + 1 for stop codon
+        variant_specific (str) = nucleotides for variant specific substitution 
+        upstream_homology_arm  
+        downstream_homology_arm
+        
+        Returns:
+        mutated_sequence (str) - sequence with new codon mutated in
+        '''
+        print(f'Recodonised template (length:{len(recodonised_hdr_template)}')
+        print(recodonised_hdr_template)
+        
+        #mutate sequence on index position
+        mutated_sequences = []
+        current_codon = recodonised_hdr_template[spec_aa_codon_start:spec_aa_codon_start+3]
+        print(f'Codon to be mutated {current_codon} at position {spec_aa_codon_start}-{spec_aa_codon_start+2}')
+        current_amino_acid = translate(current_codon)
+        print(current_amino_acid)
+        
+        for aa_codon in codon_list:
+            print(aa_codon)
+            new_codon = str(aa_codon[1])
+            print(new_codon)
+            mutated_sequence = recodonised_hdr_template[:spec_aa_codon_start] + new_codon + recodonised_hdr_template[spec_aa_codon_start+3:]
+            print(f'mutated_sequence (length:{len(mutated_sequence)})')
+            print(mutated_sequence)
+            if len(mutated_sequence) == len(recodonised_hdr_template):
+                mutated_sequences.append(mutated_sequence)
+        
+        # Add variant specific codon if it's suppled and not already in the codon list  
+        if variant_specific is not None and variant_specific not in codon_list:
+            mutated_sequence = recodonised_hdr_template[:spec_aa_codon_start] + variant_specific + recodonised_hdr_template[spec_aa_codon_start+3:]
+            mutated_sequences.append(mutated_sequence)
+
+        print(f'hdr template library (size:{len(mutated_sequences)})')
+        print(mutated_sequences)
+        
+        if spec_aa_codon_start % 3 == 0:
+            print('Exons are in frame')
+            n = 0
+        elif spec_aa_codon_start % 3 == 1:
+            print('Exons are out of frame by 1 position. Shifting start of recodonisation by 1')
+            n = 1
+        elif spec_aa_codon_start % 3 == 2:
+            print('Exons are out of frame by 2 positions. Shifting start of recodonisation by 2')
+            n = 2
+        print('hdr template library (amino_acids)')
+        
+        aa_mutated_sequences = [] 
+        for i in mutated_sequences:
+            aa_mutated_sequence = translate(i[n::])
+            aa_mutated_sequences.append(aa_mutated_sequence)
+
+        print('Translation of mutated sequences:')      
+        print(aa_mutated_sequences)
+
+        #add homology arms 
+        mutated_sequences_plus_homology_arms = [f"{upstream_homology_arm}_{sequence}_{downstream_homology_arm}" for sequence in mutated_sequences]
+
+
+        return mutated_sequences_plus_homology_arms

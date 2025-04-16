@@ -2,13 +2,11 @@ import sys
 import pandas as pd 
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
-from ui.CRISPR_TAPE_2 import Ui_MainWindow  # Import the generated UI class
+from ui.CORe_designer import Ui_MainWindow  # Import the generated UI class
 from app_uniprot_id_to_genomic_loci_to_guide_generation import extract_genomic_information_from_uniprot_id, extract_genomic_loci_from_genomic_information,find_guides, get_codon_index, get_GC_content, guide_RNA_notes, specific_function_guide_RNA_generation
-from app_selected_guides_to_hdr_template import generate_hdr_template, recodonise_sequence
-from app_integration_specific_primers import generate_integration_specific_primers
+from app_selected_guides_to_hdr_template import generate_hdr_template, recodonise_hdr_template, reconstruct_loci_with_recodonised_hdr_template, generate_hdr_library
+from app_integration_specific_primers import design_integration_specific_primers
 from app_utils import extract_genome_multifast_to_list_of_sequence_records
-
-
 
 #Class for pop up table needed for guide RNA selection
 class PopUpTable(QDialog):
@@ -81,6 +79,7 @@ class MainApp(QtWidgets.QMainWindow):
         self.upstream_homology_arm_end_position = None
         self.downstream_homology_arm_start_position = None
         self.genomic_information_loci_extracted_plus_guides_plus_hdr = None
+        self.loci_plus_recodonised_hdr_template = None
 
         # Call on text inputs from the QLineEdit boxes
         self.ui.uniprot_id_line_edit.editingFinished.connect(self.save_text_uniprot_id)
@@ -140,6 +139,21 @@ class MainApp(QtWidgets.QMainWindow):
                 value = str(dataframe.iloc[row, column])
                 item = QTableWidgetItem(value)
                 self.ui.results_table.setItem(row, column, item)
+    
+    def populate_hdr_library_table(self, dataframe):
+        """Populate QTableWidget with the contents of a Pandas DataFrame."""
+        self.ui.hdr_library_table.setRowCount(len(dataframe))
+        self.ui.hdr_library_table.setColumnCount(len(dataframe.columns))
+
+        # Set the column headers
+        self.ui.hdr_library_table.setHorizontalHeaderLabels(dataframe.columns)
+
+        # Fill the table
+        for row in range(len(dataframe)):
+            for column in range(len(dataframe.columns)):
+                value = str(dataframe.iloc[row, column])
+                item = QTableWidgetItem(value)
+                self.ui.hdr_library_table.setItem(row, column, item)
 
     def upload_file_action(self):
         # Open a file dialog to select a file
@@ -154,9 +168,9 @@ class MainApp(QtWidgets.QMainWindow):
             QMessageBox.warning(None, "No File", "No file was selected.")
     
     def get_gRNAs_action(self):
-
-        # First get the save the uniprot ID and process the file against the uploaded reference genome
+        # First get the uniprot ID and process the file against the uploaded reference genome
         # Define the process when get_'sgRNAs' button is clicked
+        
         # Error handling if file has not been selected 
         if not self.selected_file:  # Check if a file has been selected
             QMessageBox.information(None, "No reference genome file found ", "Please upload a file first.")
@@ -185,6 +199,7 @@ class MainApp(QtWidgets.QMainWindow):
         print(loci)
         grna_distance = self.saved_gRNA_distance
         guides = specific_function_guide_RNA_generation(amino_acid_position, loci, genome_sequence_records, minimum_distance=30, maximum_distance = grna_distance)
+        
         print('All guides')
         print(guides)
 
@@ -194,12 +209,11 @@ class MainApp(QtWidgets.QMainWindow):
         if guide_pop_up.exec_() == QDialog.Accepted:
             selected_guides = guide_pop_up.selected_guides
             self.selected_guide_df = pd.DataFrame(selected_guides, columns=guides.columns)
-            
-        
+             
         selected_guides = self.selected_guide_df
         print('Selected guides are:')
         print(selected_guides)
-
+        
         #add guide information to the genomic_information_loci_extracted DataFrame
         upstream_guide = selected_guides.loc[[0]].reset_index(drop = True)
         print(upstream_guide)
@@ -242,15 +256,17 @@ class MainApp(QtWidgets.QMainWindow):
         print(loci)
         upstream_guide_position = int(upstream_guide['Upstream guide RNA Position on + strand'])
         downstream_guide_position = int(downstream_guide['Downstream guide RNA Position on + strand'])
-        hdr_template, upstream_homology_arm, upstream_homology_arm_start_position, upstream_homology_arm_end_position, downstream_homology_arm, downstream_homology_arm_start_position, downstream_homology_arm_end_postion = generate_hdr_template(loci, upstream_guide_position, downstream_guide_position, homology_overlap = 100)
+        hdr_template, upstream_homology_arm, upstream_homology_arm_start_position, upstream_homology_arm_end_position, downstream_homology_arm, downstream_homology_arm_start_position, downstream_homology_arm_end_postion = generate_hdr_template(loci, upstream_guide_position, downstream_guide_position, homology_overlap = 60)
         print(hdr_template)
 
         upstream_guide_distance = int(upstream_guide['Upstream guide RNA Distance from Amino Acid (bp)'])
         downstream_guide_distance = int(downstream_guide['Downstream guide RNA Distance from Amino Acid (bp)'])
-        hdr_template_recodonised, spec_aa_codon_start, recodonisation_check = recodonise_sequence(hdr_template, upstream_guide_distance, downstream_guide_distance)
+        hdr_template_recodonised, spec_aa_codon_start, recodonisation_check = recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_guide_distance)
         print(hdr_template_recodonised)
         
         #Save to class space so that variables can be used in other functions 
+        self.upstream_guide_distance = upstream_guide_distance
+        self.downstream_guide_distance = downstream_guide_distance
         self.upstream_homology_arm_end_position = hdr_template_recodonised
         self.upstream_homology_arm_end_position = upstream_homology_arm_end_position
         self.downstream_homology_arm_start_position = downstream_homology_arm_start_position
@@ -265,9 +281,19 @@ class MainApp(QtWidgets.QMainWindow):
         self.genomic_information_loci_extracted_plus_guides_plus_hdr = genomic_information_loci_extracted_plus_guides_plus_hdr
         print(genomic_information_loci_extracted_plus_guides_plus_hdr)
 
-        # Update the results table
+        #Reconstruct the loci with the recodonised HDR template   
+        loci_plus_recodonised_hdr_template, section_loci_plus_recodonised_hdr_template = reconstruct_loci_with_recodonised_hdr_template(loci, hdr_template_recodonised, upstream_homology_arm_end_position, downstream_homology_arm_start_position)
+        self.loci_plus_recodonised_hdr_template = loci_plus_recodonised_hdr_template
+
+        #Generate hdr_library
+        hdr_library = generate_hdr_library(hdr_template_recodonised, spec_aa_codon_start, upstream_homology_arm, downstream_homology_arm)
+        print(hdr_library)
+        hdr_library = pd.DataFrame(hdr_library, columns=["HDR_library"])
+       
+       #Update the results table
         QMessageBox.information(None, "HDR template generated", "Click OK to add the information to the results table.")
         self.populate_results_table(genomic_information_loci_extracted_plus_guides_plus_hdr)
+        self.populate_hdr_library_table(hdr_library)
     
     def get_integration_specific_primers_action(self):
         '''function for downstream workflow if generate integration specific primers button is pressed'''
@@ -278,22 +304,23 @@ class MainApp(QtWidgets.QMainWindow):
         loci = str(self.loci)
         hdr_template_recodonised = str(self.hdr_template_recodonised)
         upstream_homology_arm_end_position = int(self.upstream_homology_arm_end_position)
+        upstream_guide_distance = int(self.upstream_guide_distance)
         downstream_homology_arm_start_position = int(self.downstream_homology_arm_start_position)
+        downstream_guide_distance = int(self.downstream_guide_distance)
+        loci_plus_recodonised_hdr_template = str(self.loci_plus_recodonised_hdr_template)
 
         #Run primer 3 function
-        loci_plus_recodonised_hdr_template, recodonised_loci_reconstruction_check, left_primer_sequence, left_primer_tm, right_primer_sequence, right_primer_tm = generate_integration_specific_primers(loci, hdr_template_recodonised, upstream_homology_arm_end_position, downstream_homology_arm_start_position)
-        primer_list = [loci_plus_recodonised_hdr_template, recodonised_loci_reconstruction_check, left_primer_sequence, left_primer_tm, right_primer_sequence, right_primer_tm]
+        primer_list = design_integration_specific_primers(hdr_template_recodonised, loci_plus_recodonised_hdr_template, upstream_homology_arm_end_position, upstream_guide_distance, downstream_homology_arm_start_position, downstream_guide_distance)
         print(primer_list)
-        primer_df = pd.DataFrame(data = [primer_list], columns= ['loci_plus_recodonised_hdr_template', 'recodonised_loci_reconstruction_check', 'left_primer_sequence', 'left_primer_tm','right_primer_sequence','right_primer_tm'])
-        print(primer_df)
-        genomic_information_loci_extracted_plus_guides_plus_hdr = self.genomic_information_loci_extracted_plus_guides_plus_hdr
-        genomic_information_loci_extracted_plus_guides_plus_hdr_plus_primers = pd.concat([genomic_information_loci_extracted_plus_guides_plus_hdr, primer_df], axis = 1)
-        print(genomic_information_loci_extracted_plus_guides_plus_hdr_plus_primers)
+        primer_df = pd.DataFrame(data = [primer_list], columns= ['left_primer_sequence', 'left_primer_tm','right_primer_sequence','right_primer_tm'])
         QMessageBox.information(None, "Primers generated", "Click OK to add the information to the results table.")
-        self.populate_results_table(genomic_information_loci_extracted_plus_guides_plus_hdr_plus_primers)
+        self.populate_results_table(primer_df)
 
     def save_action(self):
         """Save the contents of the results_table to a CSV file."""
+
+        QMessageBox.information(None, "Saving main results table", "Click OK to select save location.")
+
         # Extract the data from the results_table
         data = []
         rows = self.ui.results_table.rowCount()
@@ -319,6 +346,35 @@ class MainApp(QtWidgets.QMainWindow):
             # Save the DataFrame to a CSV file
             df.to_csv(file_name, index=False)
             print(f"Data saved to {file_name}")
+        
+        """Save the contents of the results_table to a CSV file."""
+        QMessageBox.information(None, "Saving hdr library table", "Click OK to select save location.")
+
+        # Extract the data from the results_table
+        data = []
+        rows = self.ui.hdr_library_table.rowCount()
+        columns = self.ui.hdr_library_table.columnCount()
+
+        # Collect data from the table
+        for row in range(rows):
+            row_data = []
+            for column in range(columns):
+                item = self.ui.hdr_library_table.item(row, column)
+                row_data.append(item.text() if item else "")
+            data.append(row_data)
+
+        # Create a DataFrame from the table data
+        column_headers = [self.ui.hdr_library_table.horizontalHeaderItem(i).text() for i in range(columns)]
+        df = pd.DataFrame(data, columns=column_headers)
+
+        # Open a file dialog to choose the file location
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv);;All Files (*)", options=options)
+
+        if file_name:
+            # Save the DataFrame to a CSV file
+            df.to_csv(file_name, index=False)
+            print(f"Data saved to {file_name}")
 
     def reset_action(self):
         """Reset the entire application to its initial state."""
@@ -329,6 +385,7 @@ class MainApp(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    print('Running app.py')
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainApp()
     main_window.show()
