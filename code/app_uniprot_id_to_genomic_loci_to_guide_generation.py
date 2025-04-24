@@ -109,7 +109,6 @@ def recursive_translate(genomic_loci_exons, genomic_information_loci_extracted):
             print("Translation matched. Marking as 'Pass'.")
             genomic_information_loci_extracted['loci_exons'] = atg_start_sequence
             return genomic_information_loci_extracted
-
         else:
             print('Translation match failed. Checking next index position.')
     # If no translation matches after checking all positions, mark as 'Fail'
@@ -272,6 +271,11 @@ def find_guides(loci, pam):
                     
     else:
         raise ValueError("PAM not recognised")
+    
+    print(pam_found)
+    print(crRNA_DNA_sequence_start_position)
+    print(crRNA_DNA_sequence)
+    print(strand)
 
     return pam_found, crRNA_DNA_sequence_start_position, crRNA_DNA_sequence, strand
 

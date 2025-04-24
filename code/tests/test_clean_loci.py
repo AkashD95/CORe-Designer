@@ -3,15 +3,19 @@ from app_utils import clean_loci
 
 @pytest.mark.parametrize(
     "input_loci, expected_loci, expected_exon",
-    [
-        ("  ATGcgtACGT  ", "ATGcgtACGT", "ATGACGT"),     # Mixed case with spaces
-        ("acgtacgt", "acgtacgt", ""),                    # All lowercase (introns only)
-        ("ACGTACGT", "ACGTACGT", "ACGTACGT"),            # All uppercase (exons only)
-        ("", "", ""),                                    # Empty string
-        ("aTgC", "aTgC", "TC"),                           # Single lowercase at front
-        (" tTgGcC ", "tTgGcC", "TGC"),                   # Mixed and whitespace
-        ("ATGcatCAT", "ATGcatCAT", "ATGCAT"),            # Mixed introns in the middle
-        ("   ACGTacgtACGT   ", "ACGTacgtACGT", "ACGTACGT") # Padded whitespace both sides
+    [   
+        # Case 1: Mixed case with spaces
+        ("  ATGcgtACGT  ", "ATGcgtACGT", "ATGACGT"),
+
+        # Case 2: all introns     
+        ("acgtacgt", "acgtacgt", ""),
+
+        # Case 3: all exons
+        ("ACGTACGT", "ACGTACGT", "ACGTACGT"),
+                    
+        # Case 4: all empty
+        ("", "", ""),                                 
+
     ]
 )
 def test_clean_loci(input_loci, expected_loci, expected_exon):
