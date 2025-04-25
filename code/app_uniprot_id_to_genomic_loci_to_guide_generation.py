@@ -292,6 +292,7 @@ def get_codon_index(loci, loci_exon):
     Returns:
     protein_dict (dict): a dictionary where each base in the loci exon is mapped to a protein and its location in the loci
     """
+    assert loci_exon, "Loci exon is empty" #assertion to check if loci exon exists
     assert len(loci_exon) % 3 == 0, "The length of the coding sequence is not a multiple of 3" #Check that exon is a multiple of 3
     Base_df = pd.DataFrame(list(loci), columns = ["Base"]) #List of all the bases in the genomic loci
     Base_df["Position"] = Base_df.index
@@ -326,6 +327,7 @@ def get_GC_content(grna_dna_sequence):
     """
     gc_count = 0
     base_count = 0
+    assert grna_dna_sequence
     for char in grna_dna_sequence:
         if char.isalpha(): #Count the length of the guide RNA
             gc_count += 1

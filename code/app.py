@@ -75,6 +75,7 @@ class MainApp(QtWidgets.QMainWindow):
         self.saved_text_gRNA_distance = None
         self.loci = None
         self.genomic_information_loci_extracted_plus_guides = None
+        self.homology_arm_length = None
         self.hdr_template_recodonised = None
         self.upstream_homology_arm_end_position = None
         self.downstream_homology_arm_start_position = None
@@ -85,7 +86,7 @@ class MainApp(QtWidgets.QMainWindow):
         self.ui.uniprot_id_line_edit.editingFinished.connect(self.save_text_uniprot_id)
         self.ui.amino_acid_position_line_edit.editingFinished.connect(self.save_text_amino_acid_position)
         self.ui.gRNA_distance_line_edit.editingFinished.connect(self.save_text_gRNA_distance)
-
+        self.ui.homology_arm_length_lineEdit.editingFinished.connect(self.save_text_homology_arm_length)
         # Connect buttons to functions
         self.ui.upload_reference_genome_button.clicked.connect(self.upload_file_action)
         self.ui.get_sgRNAs_button.clicked.connect(self.get_gRNAs_action)
@@ -96,8 +97,10 @@ class MainApp(QtWidgets.QMainWindow):
     
 
     def save_text_uniprot_id(self):
+        print('Saving uniprot id:')
         # Get the text from the QLineEdit
         text = self.ui.uniprot_id_line_edit.text()
+        print(text)
 
         if text.strip():  # Check if the text is not empty
             # Save the text to a variable (or file, database, etc.)
@@ -106,8 +109,10 @@ class MainApp(QtWidgets.QMainWindow):
             QMessageBox.warning(self, "No Input", "Please enter text before leaving the field.")
     
     def save_text_amino_acid_position(self):
+        print('Saving amino acid position:')
         # Get the text from the QLineEdit
         text = self.ui.amino_acid_position_line_edit.text()
+        print(text)
 
         if text.strip():  # Check if the text is not empty
             # Save the text to a variable (or file, database, etc.)
@@ -116,8 +121,10 @@ class MainApp(QtWidgets.QMainWindow):
             QMessageBox.warning(self, "No Input", "Please enter text before leaving the field.")
 
     def save_text_gRNA_distance(self):
+        print('Saving gRNA distance:')
         # Get the text from the QLineEdit
         text = self.ui.gRNA_distance_line_edit.text()
+        print(text)
 
         if text.strip():  # Check if the text is not empty
             # Save the text to a variable (or file, database, etc.)
@@ -125,6 +132,18 @@ class MainApp(QtWidgets.QMainWindow):
         else:
             QMessageBox.warning(self, "No Input", "Please enter text before leaving the field.")
     
+    def save_text_homology_arm_length(self):
+        # Get the text from the QLineEdit
+        print('Saving homology arm length:')
+        text = self.ui.homology_arm_length_lineEdit.text()
+        print(text)
+
+        if text.strip():  # Check if the text is not empty
+            # Save the text to a variable (or file, database, etc.)
+            self.homology_arm_length = text
+        else:
+            QMessageBox.warning(self, "No Input", "Please enter text before leaving the field.")
+
     def populate_results_table(self, dataframe):
         """Populate QTableWidget with the contents of a Pandas DataFrame."""
         self.ui.results_table.setRowCount(len(dataframe))
@@ -245,18 +264,20 @@ class MainApp(QtWidgets.QMainWindow):
 
         #add guide information to the genomic_information_loci_extracted DataFrame
         upstream_guide = selected_guides.loc[[0]]
-        print(upstream_guide)
         upstream_guide.columns = ['Upstream guide RNA ' + col for col in upstream_guide.columns]
         downstream_guide = selected_guides.loc[[1]]
-        print(downstream_guide)
         downstream_guide.columns = ['Downstream guide RNA ' + col for col in downstream_guide]
-        print(downstream_guide)
-        
         loci = str(self.loci)
-        print(loci)
         upstream_guide_position = int(upstream_guide['Upstream guide RNA Position on + strand'])
         downstream_guide_position = int(downstream_guide['Downstream guide RNA Position on + strand'])
-        hdr_template, upstream_homology_arm, upstream_homology_arm_start_position, upstream_homology_arm_end_position, downstream_homology_arm, downstream_homology_arm_start_position, downstream_homology_arm_end_postion = generate_hdr_template(loci, upstream_guide_position, downstream_guide_position, homology_overlap = 60)
+
+        #Get homology arm length
+        homology_arm_length = int(self.homology_arm_length)
+        print('Inputted homology arm length:')
+        print(homology_arm_length)
+
+
+        hdr_template, upstream_homology_arm, upstream_homology_arm_start_position, upstream_homology_arm_end_position, downstream_homology_arm, downstream_homology_arm_start_position, downstream_homology_arm_end_postion = generate_hdr_template(loci, upstream_guide_position, downstream_guide_position, homology_overlap = homology_arm_length)
         print(hdr_template)
 
         upstream_guide_distance = int(upstream_guide['Upstream guide RNA Distance from Amino Acid (bp)'])

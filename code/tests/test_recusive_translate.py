@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from unittest.mock import patch
-from app_uniprot_id_to_genomic_loci_to_guide_generation import recursive_translate  # Replace with your actual module name
+from app_uniprot_id_to_genomic_loci_to_guide_generation import recursive_translate  
 
 
 @pytest.mark.parametrize("genomic_loci_exons, mock_translation, expected_protein, expected_result, loci_exons_expected", [

@@ -46,15 +46,13 @@ def translate(dna_seq):
     [
         # Case 1: valid cases
         ("aaaATGgggTTTcccGGTaaa", "ATGTTTGGT", ["M", "F", "G"], "valid"),
-        
-        # # ❌ Invalid exon length
-        # ("AAAATGCCCGGA", "ATGTTT", None, "invalid_length"),
-        # ("AAAATGCCCGGA", "GGA", None, "invalid_length"),
-        # ("AAAATGCCCGGA", "ATGCGTAAAG", None, "invalid_length"),
 
-        # # ⚠️ Empty or whitespace exon
-        # ("aaaATGcccTTTgggGGT", "", None, "empty"),
-        # ("aaaATGcccTTTgggGGT", "   ", None, "empty"),
+        # Case 2: invalid exon length
+        ("aaaATGgggTTTcccGGaaa", "ATGTTTGG", None, "invalid_length"),
+    
+        # Case 3: no exon
+        ("aaaatgccctttgggggt", "", None, "empty"),
+        
     ]
 )
 def test_get_codon_index(loci, loci_exon, expected_aas, test_type):

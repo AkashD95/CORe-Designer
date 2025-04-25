@@ -170,6 +170,9 @@ QSpinBox::down-button {
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
         <string>Tab 1</string>
@@ -200,7 +203,7 @@ QSpinBox::down-button {
               </font>
              </property>
              <property name="text">
-              <string>Welcome to CRISPR-TAPE 2.0</string>
+              <string>Welcome to CORe designer</string>
              </property>
             </widget>
            </item>
@@ -224,20 +227,6 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="gRNA_distance_line_edit">
-             <property name="text">
-              <string>e.g 100</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2" colspan="2">
-            <widget class="QPushButton" name="get_sgRNAs_button">
-             <property name="text">
-              <string>Generate guide RNAs</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_4">
              <property name="font">
@@ -252,24 +241,14 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
-            <widget class="QLineEdit" name="amino_acid_position_line_edit">
+           <item row="3" column="2" colspan="2">
+            <widget class="QPushButton" name="get_sgRNAs_button">
              <property name="text">
-              <string>e.g. 50</string>
+              <string>Generate guide RNAs</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1" colspan="3">
-            <widget class="QPushButton" name="upload_reference_genome_button">
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-             <property name="text">
-              <string>Upload reference genome</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_12">
              <property name="font">
               <font>
@@ -290,18 +269,36 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="amino_acid_position_line_edit">
+             <property name="text">
+              <string>e.g. 50</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="3">
+            <widget class="QPushButton" name="upload_reference_genome_button">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>Upload reference genome</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="gRNA_distance_line_edit">
+             <property name="text">
+              <string>e.g 100</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
         <item row="2" column="0">
          <widget class="QWidget" name="widget_4" native="true">
           <layout class="QGridLayout" name="gridLayout_2">
-           <property name="horizontalSpacing">
-            <number>20</number>
-           </property>
-           <property name="verticalSpacing">
-            <number>15</number>
-           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_5">
              <property name="font">
@@ -312,7 +309,21 @@ QSpinBox::down-button {
               </font>
              </property>
              <property name="text">
-              <string>Generate homology directed design template</string>
+              <string>Please specify homology arm length and click generate homology directed repair (HDR) library</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="homology_arm_length_lineEdit">
+             <property name="text">
+              <string>e.g 100</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="generate_hdr_template_button">
+             <property name="text">
+              <string>Generate HDR library</string>
              </property>
             </widget>
            </item>
@@ -330,17 +341,10 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="1" column="1" colspan="2">
             <widget class="QPushButton" name="generate_integration_specifc_primer_button">
              <property name="text">
               <string>Generate integration specific primers</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="generate_hdr_template_button">
-             <property name="text">
-              <string>Generate homology directed repair template</string>
              </property>
             </widget>
            </item>
@@ -388,9 +392,6 @@ QSpinBox::down-button {
            <property name="verticalSpacing">
             <number>15</number>
            </property>
-           <item row="1" column="1">
-            <widget class="QTableWidget" name="results_table"/>
-           </item>
            <item row="2" column="1">
             <widget class="QTableWidget" name="hdr_library_table"/>
            </item>
@@ -407,6 +408,9 @@ QSpinBox::down-button {
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;HDR library results&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QTableWidget" name="results_table"/>
            </item>
           </layout>
          </widget>

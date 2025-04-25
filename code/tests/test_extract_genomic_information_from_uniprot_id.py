@@ -63,7 +63,6 @@ def test_extract_genomic_information_from_uniprot_id(mock_get):
     # Assertions
     assert isinstance(df, pd.DataFrame)
     assert not df.empty
-    assert "accession" in df.columns
     assert df.loc[0, "accession"] == "P12345"
     assert df.loc[0, "gnCoordinate.ensemblGeneId"] == "ENSG00000123456"
     assert df.loc[0, "exon_id"] == "1,2"
