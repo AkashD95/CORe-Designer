@@ -69,7 +69,8 @@ class MainApp(QtWidgets.QMainWindow):
         self.ui.setupUi(self)  # Set up the UI on this QMainWindow instance
 
         # Attributes to store variables
-        self.selected_file = None  
+        self.selected_reference_genome = None  
+        self.selected_codon_usage_table = None
         self.saved_text_uniprot_id = None
         self.saved_text_amino_acid_number = None
         self.saved_text_gRNA_distance = None
@@ -88,14 +89,15 @@ class MainApp(QtWidgets.QMainWindow):
         self.ui.gRNA_distance_line_edit.editingFinished.connect(self.save_text_gRNA_distance)
         self.ui.homology_arm_length_lineEdit.editingFinished.connect(self.save_text_homology_arm_length)
         # Connect buttons to functions
-        self.ui.upload_reference_genome_button.clicked.connect(self.upload_file_action)
+        self.ui.upload_reference_genome_button.clicked.connect(self.upload_reference_genome_action)
+        self.ui.upload_codon_usage_table_button.clicked.connect(self.upload_codon_usage_table_action)
         self.ui.get_sgRNAs_button.clicked.connect(self.get_gRNAs_action)
         self.ui.generate_hdr_template_button.clicked.connect(self.get_hdr_template_action)
         self.ui.generate_integration_specifc_primer_button.clicked.connect(self.get_integration_specific_primers_action)
         self.ui.save_button.clicked.connect(self.save_action)
         self.ui.reset_button.clicked.connect(self.reset_action)  
     
-
+    #Functions to save text
     def save_text_uniprot_id(self):
         print('Saving uniprot id:')
         # Get the text from the QLineEdit
@@ -144,6 +146,7 @@ class MainApp(QtWidgets.QMainWindow):
         else:
             QMessageBox.warning(self, "No Input", "Please enter text before leaving the field.")
 
+    #Functions to populate results tables 
     def populate_results_table(self, dataframe):
         """Populate QTableWidget with the contents of a Pandas DataFrame."""
         self.ui.results_table.setRowCount(len(dataframe))
@@ -174,14 +177,27 @@ class MainApp(QtWidgets.QMainWindow):
                 item = QTableWidgetItem(value)
                 self.ui.hdr_library_table.setItem(row, column, item)
 
-    def upload_file_action(self):
+    #Functions to run after buttons are pressed
+    def upload_reference_genome_action(self):
         # Open a file dialog to select a file
         file_name, _ = QFileDialog.getOpenFileName(None, "Select File", "", "All Files (*.*);;Text Files (*.txt);;FASTA Files (*.fasta)")
 
         if file_name:  # If a file was selected
             QMessageBox.information(None, "File Selected", f"You selected: {file_name}")
             # You can use the selected file path (file_name) for further processing
-            self.selected_file = file_name  # Store the file path
+            self.selected_reference_genome = file_name  # Store the file path
+            print(f"Selected file: {file_name}")
+        else:
+            QMessageBox.warning(None, "No File", "No file was selected.")
+
+    def upload_codon_usage_table_action(self):
+        # Open a file dialog to select a file
+        file_name, _ = QFileDialog.getOpenFileName(None, "Select File", "", "All Files (*.*);;Text Files (*.txt);;FASTA Files (*.fasta)")
+
+        if file_name:  # If a file was selected
+            QMessageBox.information(None, "File Selected", f"You selected: {file_name}")
+            # You can use the selected file path (file_name) for further processing
+            self.selected_codon_usage_table = file_name  # Store the file path
             print(f"Selected file: {file_name}")
         else:
             QMessageBox.warning(None, "No File", "No file was selected.")
@@ -191,13 +207,13 @@ class MainApp(QtWidgets.QMainWindow):
         # Define the process when get_'sgRNAs' button is clicked
         
         # Error handling if file has not been selected 
-        if not self.selected_file:  # Check if a file has been selected
+        if not self.selected_reference_genome:  # Check if a file has been selected
             QMessageBox.information(None, "No reference genome file found ", "Please upload a file first.")
             return
         
         # Convert the file into a list of genomic records 
         QMessageBox.information(None, "Starting the guide generation process", "Click OK to continue (this may take a couple of minutes), a table with generated guides for selection will pop up after this process is complete.")
-        genome_sequence_records = extract_genome_multifast_to_list_of_sequence_records(self.selected_file)
+        genome_sequence_records = extract_genome_multifast_to_list_of_sequence_records(self.selected_reference_genome)
         print('genome sequence records')
         print(genome_sequence_records)
         uniprot_id = self.saved_text_uniprot_id
@@ -276,13 +292,19 @@ class MainApp(QtWidgets.QMainWindow):
         print('Inputted homology arm length:')
         print(homology_arm_length)
 
-
         hdr_template, upstream_homology_arm, upstream_homology_arm_start_position, upstream_homology_arm_end_position, downstream_homology_arm, downstream_homology_arm_start_position, downstream_homology_arm_end_postion = generate_hdr_template(loci, upstream_guide_position, downstream_guide_position, homology_overlap = homology_arm_length)
         print(hdr_template)
 
         upstream_guide_distance = int(upstream_guide['Upstream guide RNA Distance from Amino Acid (bp)'])
         downstream_guide_distance = int(downstream_guide['Downstream guide RNA Distance from Amino Acid (bp)'])
-        hdr_template_recodonised, spec_aa_codon_start, recodonisation_check = recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_guide_distance)
+        
+        #Get codon usage table and process into dictionary
+        codon_usage_table_file = self.selected_codon_usage_table
+        codon_usage_table = pd.read_excel(codon_usage_table_file)
+        codon_usage_table_dict = dict(zip(codon_usage_table['Codon'], codon_usage_table['Frequency']))
+        
+        
+        hdr_template_recodonised, spec_aa_codon_start, recodonisation_check = recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_guide_distance, codon_usage_table=codon_usage_table_dict)
         print(hdr_template_recodonised)
         
         #Save to class space so that variables can be used in other functions 

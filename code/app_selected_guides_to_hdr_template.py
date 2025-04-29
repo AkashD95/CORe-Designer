@@ -34,13 +34,14 @@ def generate_hdr_template(loci, upstream_guide_position, downstream_guide_positi
     
     return hdr_template, upstream_homology_arm,upstream_homology_arm_start, upstream_homology_arm_end, downstream_homology_arm, downstream_homology_arm_start, downstream_homology_arm_end
 
-def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_guide_distance):
+def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_guide_distance, codon_usage_table):
     """
     Recodonise hdr template to codon with nearest amino acid frequency.
     Arguments: 
     hdr_template(str): hdr template sequence to be used used as the template for recodonisation
     upstream_guide_distance (int): distance from start of upstream guide RNA to the start of the codon for the amino acid of interest
     downstream_guide_distance (int): distance from the start of the downstream guide RNA to the end of the codon for the amino acid of interest
+    codon_usage_table (dict): a python dictionary of codon as key and frequency as value
     
     Returns: 
     recodonised_hdr_template(str): recodonised template sequence to be used base template for hdr library generation
@@ -49,7 +50,7 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
 
     """
 
-    # 3 dictionaries to be used by the function
+    # 2 dictionaries to be used by the function
     # codon_dict pairs each codon to the corresponding amino acid
     codon_dict = {
     'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
@@ -99,123 +100,7 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
     'W': ['TGG'], #Tryptophan
     '*': ['TAA', 'TAG', 'TGA']  # Stop codons
 }
-    # human frequency dict pairs each codon to a it frequence usage using the codon frequency table found at. 
-    human_frequency_dict = {
-        # Isoleucine (Ile)
-        'ATA': 0.16,
-        'ATC': 0.48,
-        'ATT': 0.36,
-        
-        # Methionine (Met)
-        'ATG': 1.00,  
-        
-        # Threonine (Thr)
-        'ACA': 0.28,
-        'ACC': 0.36,
-        'ACG': 0.12,
-        'ACT': 0.24,
-        
-        # Asparagine (Asn)
-        'AAC': 0.54,
-        'AAT': 0.46,
-        
-        # Lysine (Lys)
-        'AAA': 0.42,
-        'AAG': 0.58,
-        
-        # Serine (Ser)
-        'AGC': 0.24,
-        'AGT': 0.15,
-        
-        # Arginine (Arg)
-        'AGA': 0.20,
-        'AGG': 0.20,
-        
-        # Leucine (Leu)
-        'CTA': 0.07,
-        'CTC': 0.20,
-        'CTG': 0.41,
-        'CTT': 0.13,
-        
-        # Proline (Pro)
-        'CCA': 0.27,
-        'CCC': 0.33,
-        'CCG': 0.11,
-        'CCT': 0.28,
-        
-        # Histidine (His)
-        'CAC': 0.59,
-        'CAT': 0.41,
-        
-        # Glutamine (Gln)
-        'CAA': 0.25,
-        'CAG': 0.75,
-        
-        # Arginine (Arg)
-        'CGA': 0.11,
-        'CGC': 0.19,
-        'CGG': 0.21,
-        'CGT': 0.08,
-        
-        # Valine (Val)
-        'GTA': 0.11,
-        'GTC': 0.24,
-        'GTG': 0.47,
-        'GTT': 0.18,
-        
-        # Alanine (Ala)
-        'GCA': 0.23,
-        'GCC': 0.40,
-        'GCG': 0.11,
-        'GCT': 0.26,
-        
-        # Aspartic acid (Asp)
-        'GAC': 0.54,
-        'GAT': 0.46,
-        
-        # Glutamic acid (Glu)
-        'GAA': 0.42,
-        'GAG': 0.58,
-        
-        # Glycine (Gly)
-        'GGA': 0.25,
-        'GGC': 0.34,
-        'GGG': 0.25,
-        'GGT': 0.16,
-        
-        # Serine (Ser)
-        'TCA': 0.15,
-        'TCC': 0.22,
-        'TCG': 0.06,
-        'TCT': 0.18,
-        
-        # Phenylalanine (Phe)
-        'TTC': 0.55,
-        'TTT': 0.45,
-        
-        # Leucine (Leu)
-        'TTA': 0.07,
-        'TTG': 0.13,
-        
-        # Tyrosine (Tyr)
-        'TAC': 0.57,
-        'TAT': 0.43,
-        
-        # Cysteine (Cys)
-        'TGC': 0.55,
-        'TGT': 0.45,
-        
-        # Tryptophan (Trp)
-        'TGG': 1.00,
-        
-        # Stop (*)
-        'TAA': 0.61,
-        'TAG': 0.09,
-        'TGA': 0.30
-    }
-
     
-  
     #First check that the hdr_template_exon is in frame and shift start point of recodonisation to be in frame
     #this is done by identifying the target codon and frameshifting to that reference
     hdr_template, hdr_template_exon = clean_loci(hdr_template)
@@ -270,7 +155,6 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
     
     recodonised_sequence = ""
     
-    
     for m, aa in enumerate(aa_sequence):
         current_codon = hdr_template_exon_dict[m]
 
@@ -278,7 +162,7 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
             recodonised_sequence += current_codon
         else:
             #print(aa, current_codon)
-            aa_dict = {codon : human_frequency_dict[codon] for codon in aa_to_codon[aa]}
+            aa_dict = {codon : codon_usage_table[codon] for codon in aa_to_codon[aa]}
             codon_freq_list = sorted(aa_dict.items(), key=lambda x: x[1], reverse=True)
             for i, codon_freq in enumerate(codon_freq_list):
                 if (codon_freq[0] == current_codon) and (i == 0):

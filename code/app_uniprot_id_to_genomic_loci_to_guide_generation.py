@@ -441,8 +441,6 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
     guide_df["Distance from start of Amino Acid (bp)"] = guide_df["Position on + strand"] - start_base
     guide_df["Distance from end of Amino Acid (bp)"] = guide_df["Position on + strand"] - end_base - 1 # -1 ensures that distances are not inclusive of the end base
   
-  
-
     # define a dataframe for if there are no guides within the distance range
     noguides = pd.DataFrame(columns=["loci_region","PAM","gRNA variable region sequence","Position on + strand","Strand","Distance from Amino Acid (bp)"])  
        
@@ -499,15 +497,22 @@ def specific_function_guide_RNA_generation(spec_aa_pos, loci, reference_genome, 
                  loci.count(reverse_complement(row['gRNA variable region sequence'] + row['PAM'])) - 1,  
     axis=1
 )
+    # Precompute sequences and reverse complements for the entire DataFrame
+    guides["gRNA + PAM"] = (guides["gRNA variable region sequence"] + guides["PAM"]).str.upper()
+    guides["reverse_complement"] = guides["gRNA + PAM"].apply(reverse_complement)
+
+    # Precompute the counts for the entire reference genome only once
+    reference_genome_seq = [record.seq.upper() for record in reference_genome]
+
+    # Compute the counts for each row in the dataframe
     guides["off target count (genome)"] = guides.apply(
         lambda row: sum(
-            record.seq.count((row['gRNA variable region sequence'] + row['PAM']).upper()) +
-            record.seq.count(reverse_complement((row['gRNA variable region sequence'] + row['PAM'] ).upper()))
-            for record in reference_genome
+            seq.count(row["gRNA + PAM"]) + seq.count(row["reverse_complement"])
+            for seq in reference_genome_seq
         ) - 1,  # Adjusting for the self-match if necessary
         axis=1
     )
-    
+
     # Add a column for loci_region
     guides["loci_region"] = str(loci_check_region)
     # Reorganise the guide RNA dataframe

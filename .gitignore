@@ -13,3 +13,6 @@ venv/
 #Ignore build and dist files in github
 build/
 dist/
+
+#Ignore .xlsx
+*.xlsx
