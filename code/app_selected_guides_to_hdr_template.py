@@ -18,7 +18,9 @@ def generate_hdr_template(loci, upstream_guide_position, downstream_guide_positi
      
     # Get the start and end indices in the loci of the region between guides
     start_hdr_template = int(upstream_guide_position)
+    print(start_hdr_template)
     end_hdr_template = int(downstream_guide_position)
+    print(end_hdr_template)
 
         
     # Calculate the indices for the start and end of homology arms
@@ -28,9 +30,12 @@ def generate_hdr_template(loci, upstream_guide_position, downstream_guide_positi
     downstream_homology_arm_end = min(len(loci), end_hdr_template + homology_overlap)
         
     # Extract the homology arms
-    hdr_template = loci[start_hdr_template:end_hdr_template] #plus one ensures that end hdr template position is included
+    hdr_template = loci[start_hdr_template:end_hdr_template] 
+    print(hdr_template)
     upstream_homology_arm = loci[upstream_homology_arm_start:upstream_homology_arm_end]
+    print(upstream_homology_arm)
     downstream_homology_arm = loci[downstream_homology_arm_start:downstream_homology_arm_end+1]
+    print(downstream_homology_arm)
     
     return hdr_template, upstream_homology_arm,upstream_homology_arm_start, upstream_homology_arm_end, downstream_homology_arm, downstream_homology_arm_start, downstream_homology_arm_end
 
@@ -157,18 +162,29 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
     
     for m, aa in enumerate(aa_sequence):
         current_codon = hdr_template_exon_dict[m]
+        print('Current codon:')
+        print(current_codon)
+        print('Translation:')
+        print(translate(current_codon))
+        
 
         if aa in ['M', "W", "*"]:
             recodonised_sequence += current_codon
+            
         else:
-            #print(aa, current_codon)
+            ##print(aa, current_codon)
             aa_dict = {codon : codon_usage_table[codon] for codon in aa_to_codon[aa]}
             codon_freq_list = sorted(aa_dict.items(), key=lambda x: x[1], reverse=True)
+            print('Codon frequency list:')
+            print(codon_freq_list)
             for i, codon_freq in enumerate(codon_freq_list):
                 if (codon_freq[0] == current_codon) and (i == 0):
-                    recodonised_sequence += codon_freq_list[1][0]  # lower down a rank
+                    recodonised_sequence += codon_freq_list[1][0]  # lower down a 
+                    print(recodonised_sequence)
+
                 elif codon_freq[0] == current_codon:
                     recodonised_sequence += codon_freq_list[i-1][0]  # upper a rank
+                    print(recodonised_sequence)
                     
     print(f'recodonised sequence (length:{len(recodonised_sequence)})')
     print(recodonised_sequence)
@@ -289,6 +305,7 @@ def generate_hdr_library(recodonised_hdr_template, spec_aa_codon_start, upstream
         elif spec_aa_codon_start % 3 == 2:
             print('Exons are out of frame by 2 positions. Shifting start of recodonisation by 2')
             n = 2
+
         print('hdr template library (amino_acids)')
         
         aa_mutated_sequences = [] 

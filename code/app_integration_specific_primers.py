@@ -43,7 +43,6 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
     if downstream_primer_range > 50:
         downstream_recodonised_primer_offset = downstream_primer_range - 50
 
-    print(loci_plus_recodonised_hdr_template[exon_start_index:exon_end_index])
     
     try: 
         if(len(loci_plus_recodonised_hdr_template) - exon_end_index < 1000):
@@ -80,7 +79,7 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
             'PRIMER_PRODUCT_SIZE_RANGE': [[450,550]]
         })
 
-        print(primers)
+        #print(primers)
         # If no primers are returned, raise an exception
         if primers['PRIMER_LEFT_NUM_RETURNED'] == 0:
             raise ValueError("No primers found")
@@ -140,7 +139,7 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
             'PRIMER_PRODUCT_SIZE_RANGE': [[450,550]]
         })
 
-        print(primers)
+        #print(primers)
         # If no primers are returned, raise an exception
         if primers['PRIMER_LEFT_NUM_RETURNED'] == 0:
             raise ValueError("No integration-specific primer found after target codon")
@@ -159,6 +158,4 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
         right_primer_start = primers['PRIMER_RIGHT'][0]['COORDS'][0]
         right_primer_len = primers['PRIMER_RIGHT'][0]['COORDS'][1]
 
-    
-    
         return left_primer_sequence, left_primer_tm, right_primer_sequence, right_primer_tm

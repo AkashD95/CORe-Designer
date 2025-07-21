@@ -7,8 +7,11 @@
 #Ignore venv
 venv/
 
-#Ignore test iypnb
-*.iypnb
+#Ignore python cache files
+*.pyc
+
+#Ignore test ipynb
+*.ipynb
 
 #Ignore build and dist files in github
 build/
