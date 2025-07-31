@@ -17,5 +17,8 @@ venv/
 build/
 dist/
 
+#ignore zip
+*.zip
+
 #Ignore .xlsx
 *.xlsx
