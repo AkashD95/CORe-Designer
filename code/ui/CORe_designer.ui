@@ -19,7 +19,7 @@
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">#centralwidget{
-background: #FAFAFA;
+background: transparent;
 }
 
 #widget,  #widget_3, #widget_5{
@@ -173,72 +173,17 @@ QSpinBox::down-button {
       <property name="whatsThis">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uniprot Locus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+      <property name="styleSheet">
+       <string notr="true">background: transparent</string>
+      </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="uniprot">
        <attribute name="title">
         <string>Uniprot locus</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="QWidget" name="widget" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QLabel" name="label">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Welcome to CORe designer</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QWidget" name="widget_5" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_11">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Results will be updated as you run through the program</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
         <item row="4" column="0">
          <widget class="QWidget" name="widget_6" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -272,6 +217,9 @@ QSpinBox::down-button {
              <property name="cursor">
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
              <property name="text">
               <string>Save</string>
              </property>
@@ -294,6 +242,9 @@ QSpinBox::down-button {
              <property name="cursor">
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
              <property name="text">
               <string>Reset</string>
              </property>
@@ -302,8 +253,43 @@ QSpinBox::down-button {
           </layout>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QWidget" name="widget_5" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background: transparent</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="font">
+              <font>
+               <pointsize>18</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Results will be updated as you run through the program</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QFrame" name="frame">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background: transparent</string>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -335,36 +321,32 @@ QSpinBox::down-button {
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QTableWidget" name="results_table"/>
+            <widget class="QTableWidget" name="results_table">
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item row="1" column="0">
          <widget class="QWidget" name="widget_2" native="true">
+          <property name="styleSheet">
+           <string notr="true">background: transparent</string>
+          </property>
           <layout class="QGridLayout" name="gridLayout_5">
-           <item row="0" column="2">
+           <item row="2" column="2">
             <widget class="QPushButton" name="upload_codon_usage_table_button">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(0, 170, 255)</string>
+             </property>
              <property name="text">
               <string>Upload codon usage table</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="QLineEdit" name="amino_acid_position_line_edit">
-             <property name="text">
-              <string>e.g. 50</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="uniprot_id_line_edit">
-             <property name="text">
-              <string>e.g. A0A075B6Q4</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="label_12">
              <property name="font">
               <font>
@@ -378,31 +360,51 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="upload_reference_genome_button">
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
+           <item row="3" column="2">
+            <widget class="QLineEdit" name="amino_acid_position_line_edit">
              <property name="text">
-              <string>Upload reference genome</string>
+              <string>e.g. 50</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="2">
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="uniprot_id_line_edit">
+             <property name="text">
+              <string>e.g. A0A075B6Q4</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
             <widget class="QPushButton" name="get_sgRNAs_button">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
              <property name="text">
               <string>Generate guide RNAs</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
+            <widget class="QPushButton" name="upload_reference_genome_button">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
+             <property name="text">
+              <string>Upload reference genome</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
             <widget class="QLineEdit" name="gRNA_distance_line_edit">
              <property name="text">
               <string>e.g 100</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="label_5">
              <property name="font">
               <font>
@@ -416,21 +418,7 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_4">
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Please upload reference genome and codon usage table</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_7">
              <property name="font">
               <font>
@@ -444,7 +432,7 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="6" column="0">
             <widget class="QLabel" name="label_6">
              <property name="font">
               <font>
@@ -458,48 +446,49 @@ QSpinBox::down-button {
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Please upload reference genome and codon usage table</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="QPushButton" name="generate_hdr_template_button">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
+             <property name="text">
+              <string>Generate HDR library</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
             <widget class="QLineEdit" name="homology_arm_length_lineEdit">
              <property name="text">
               <string>e.g 100</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="2">
-            <widget class="QPushButton" name="generate_hdr_template_button">
-             <property name="text">
-              <string>Generate HDR library</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="2">
+           <item row="6" column="2">
             <widget class="QPushButton" name="generate_integration_specifc_primer_button">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
              <property name="text">
               <string>Generate integration specific primers</string>
              </property>
             </widget>
            </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="custom">
-       <attribute name="title">
-        <string>Custom locus</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QWidget" name="widget_9" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_19">
-           <item>
-            <widget class="QLabel" name="label_62">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -521,165 +510,17 @@ QSpinBox::down-button {
           </layout>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QWidget" name="widget_10" native="true">
-          <layout class="QGridLayout" name="gridLayout_6">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_65">
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Please upload codon usage table</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="upload_codon_usage_table_button_custom">
-             <property name="text">
-              <string>Upload codon usage table</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_66">
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Please input custom locus with exons in uppercase and introns in lowecase and amino acid position</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="custom_loci_line_edit">
-             <property name="text">
-              <string>e.g. tttattATGTTAtttcc</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QLineEdit" name="amino_acid_position_line_edit_custom">
-             <property name="text">
-              <string>e.g 50</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_63">
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Please specify maximum distance from amino acid for guide generation</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="gRNA_distance_line_edit_custom">
-             <property name="text">
-              <string>e.g 100</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QPushButton" name="get_sgRNAs_button_custom">
-             <property name="text">
-              <string>Generate guide RNAs</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_64">
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Please specify homology arm length for HDR library generation</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="homology_arm_length_lineEdit_custom">
-             <property name="text">
-              <string>e.g 100</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QPushButton" name="generate_hdr_template_button_custom">
-             <property name="text">
-              <string>Generate HDR library</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_67">
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Generate integration specific primers</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="2">
-            <widget class="QPushButton" name="generate_integration_specifc_primer_button_custom">
-             <property name="text">
-              <string>Generate integration specific primers</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="custom">
+       <property name="styleSheet">
+        <string notr="true">background: transparent</string>
+       </property>
+       <attribute name="title">
+        <string>Custom locus</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
         <item row="2" column="0">
-         <widget class="QWidget" name="widget_11" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_20">
-           <item>
-            <widget class="QLabel" name="label_68">
-             <property name="font">
-              <font>
-               <pointsize>18</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Results will be updated as you run through the program</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="3" column="0">
          <widget class="QFrame" name="frame_3">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
@@ -717,7 +558,7 @@ QSpinBox::down-button {
           </layout>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="3" column="0">
          <widget class="QWidget" name="widget_12" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_21">
            <item>
@@ -750,6 +591,9 @@ QSpinBox::down-button {
              <property name="cursor">
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
              <property name="text">
               <string>Save</string>
              </property>
@@ -772,8 +616,201 @@ QSpinBox::down-button {
              <property name="cursor">
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
              <property name="text">
               <string>Reset</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QWidget" name="widget_10" native="true">
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="gRNA_distance_line_edit_custom">
+             <property name="text">
+              <string>e.g 100</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="custom_loci_line_edit">
+             <property name="text">
+              <string>e.g. tttattATGTTAtttcc</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QLineEdit" name="amino_acid_position_line_edit_custom">
+             <property name="text">
+              <string>e.g 50</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_63">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Please specify maximum distance from amino acid for guide generation</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_65">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Please upload codon usage table</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="upload_codon_usage_table_button_custom">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
+             <property name="text">
+              <string>Upload codon usage table</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_66">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Please input custom locus with exons in uppercase and introns in lowecase and amino acid position</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QPushButton" name="get_sgRNAs_button_custom">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
+             <property name="text">
+              <string>Generate guide RNAs</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_64">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Please specify homology arm length for HDR library generation</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="homology_arm_length_lineEdit_custom">
+             <property name="text">
+              <string>e.g 100</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_67">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Generate integration specific primers</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QPushButton" name="generate_hdr_template_button_custom">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
+             <property name="text">
+              <string>Generate HDR library</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="QPushButton" name="generate_integration_specifc_primer_button_custom">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 170, 255);</string>
+             </property>
+             <property name="text">
+              <string>Generate integration specific primers</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_62">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>18</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Welcome to CORe designer</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QWidget" name="widget_11" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_20">
+           <item>
+            <widget class="QLabel" name="label_68">
+             <property name="font">
+              <font>
+               <pointsize>18</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Results will be updated as you run through the program</string>
              </property>
             </widget>
            </item>

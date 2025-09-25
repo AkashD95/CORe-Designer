@@ -243,6 +243,7 @@ class MainApp(QtWidgets.QMainWindow):
                 item = QTableWidgetItem(value)
                 self.ui.results_table_custom.setItem(row, column, item)
     
+     
     def populate_hdr_library_table(self, dataframe):
         """Populate QTableWidget with the contents of a Pandas DataFrame."""
         self.ui.hdr_library_table.setRowCount(len(dataframe))

@@ -21,7 +21,7 @@ def extract_genomic_information_from_uniprot_id(uniprot_id):
     '''
     genomic_information = pd.DataFrame()
     try:
-        #print(f'Searching for UniProt ID: {uniprot_id}')
+        print(f'Searching for UniProt ID: {uniprot_id}')
         requestURL_protein = f"https://www.ebi.ac.uk/proteins/api/coordinates/{uniprot_id}"
         response_protein = requests.get(requestURL_protein, headers={"Accept": "application/json"})
         
@@ -71,6 +71,7 @@ def extract_genomic_information_from_uniprot_id(uniprot_id):
 
             # Concatenate to the main DataFrame
             genomic_information = pd.concat([genomic_information, response_protein_normalise], ignore_index=True)
+            print(f'Searching for UniProt ID: {uniprot_id} - Data found and extracted.')
         else:
             print(f"No data found for UniProt ID: {uniprot_id}")
             

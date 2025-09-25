@@ -44,6 +44,7 @@ pywin32==308
 pywin32-ctypes==0.2.3
 pyzmq==26.2.0
 requests==2.32.3
+setuptools==78.1.1
 six==1.16.0
 stack-data==0.6.3
 tornado==6.4.1
@@ -52,3 +53,4 @@ typing_extensions==4.13.1
 tzdata==2024.2
 urllib3==2.2.3
 wcwidth==0.2.13
+wheel==0.45.1
