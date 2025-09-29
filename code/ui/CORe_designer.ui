@@ -177,7 +177,7 @@ QSpinBox::down-button {
        <string notr="true">background: transparent</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="uniprot">
        <attribute name="title">
@@ -218,7 +218,7 @@ QSpinBox::down-button {
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Save</string>
@@ -243,7 +243,7 @@ QSpinBox::down-button {
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Reset</string>
@@ -339,7 +339,7 @@ QSpinBox::down-button {
            <item row="2" column="2">
             <widget class="QPushButton" name="upload_codon_usage_table_button">
              <property name="styleSheet">
-              <string notr="true">background-color:rgb(0, 170, 255)</string>
+              <string notr="true">background-color:rgb(0, 0, 255)</string>
              </property>
              <property name="text">
               <string>Upload codon usage table</string>
@@ -377,7 +377,7 @@ QSpinBox::down-button {
            <item row="4" column="2">
             <widget class="QPushButton" name="get_sgRNAs_button">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Generate guide RNAs</string>
@@ -390,7 +390,7 @@ QSpinBox::down-button {
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255)</string>
              </property>
              <property name="text">
               <string>Upload reference genome</string>
@@ -463,7 +463,7 @@ QSpinBox::down-button {
            <item row="5" column="2">
             <widget class="QPushButton" name="generate_hdr_template_button">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Generate HDR library</string>
@@ -480,7 +480,7 @@ QSpinBox::down-button {
            <item row="6" column="2">
             <widget class="QPushButton" name="generate_integration_specifc_primer_button">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Generate integration specific primers</string>
@@ -592,7 +592,7 @@ QSpinBox::down-button {
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Save</string>
@@ -617,7 +617,7 @@ QSpinBox::down-button {
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Reset</string>
@@ -682,7 +682,7 @@ QSpinBox::down-button {
            <item row="1" column="2">
             <widget class="QPushButton" name="upload_codon_usage_table_button_custom">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Upload codon usage table</string>
@@ -706,7 +706,7 @@ QSpinBox::down-button {
            <item row="3" column="2">
             <widget class="QPushButton" name="get_sgRNAs_button_custom">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Generate guide RNAs</string>
@@ -751,7 +751,7 @@ QSpinBox::down-button {
            <item row="4" column="2">
             <widget class="QPushButton" name="generate_hdr_template_button_custom">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Generate HDR library</string>
@@ -761,7 +761,7 @@ QSpinBox::down-button {
            <item row="5" column="2">
             <widget class="QPushButton" name="generate_integration_specifc_primer_button_custom">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 170, 255);</string>
+              <string notr="true">background-color: rgb(0, 0, 255);</string>
              </property>
              <property name="text">
               <string>Generate integration specific primers</string>

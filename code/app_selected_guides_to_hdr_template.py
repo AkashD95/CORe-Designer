@@ -113,16 +113,16 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
     spec_aa_codon_end = len(hdr_template) - downstream_guide_distance
     
     spec_aa_codon = hdr_template[spec_aa_codon_start:spec_aa_codon_end]
-    print(f'hdr template(length:{len(hdr_template)})')
+    print(f'hdr template(length:{len(hdr_template)}):')
     print(hdr_template)
     
-    print(f'hdr template exon (length:{len(hdr_template_exon)})')
+    print(f'hdr template exon (length:{len(hdr_template_exon)}):')
     print(hdr_template_exon)
     
     print(f'Target codon is at position: {spec_aa_codon_start} - {spec_aa_codon_end - 1}')
     print(spec_aa_codon)
     
-    print('Translation')
+    print('Translation:')
     print(f'{translate(spec_aa_codon)}')
 
     #Correct spec_aa_codon_start and end for possible introns and the start and the end
@@ -148,18 +148,16 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
         codon_start = i
         codon_end = i+3
         codon = hdr_template_exon[codon_start:codon_end]
-        print(codon)
         aa = codon_dict[codon]
         aa_sequence += aa
         hdr_template_exon_dict[i // 3] = codon
    
-    print(f'hdr sequence to be recodonised(length:{len(hdr_template[n::])})')
+    print(f'sequence to be recodonised(length:{len(hdr_template[n::])}):')
     print(hdr_template[n::])
     print('aa sequence')
     print(aa_sequence)
     
     recodonised_sequence = ""
-    
     for m, aa in enumerate(aa_sequence):
         current_codon = hdr_template_exon_dict[m]
         print('Current codon:')
@@ -169,21 +167,32 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
         
 
         if aa in ['M', "W", "*"]:
+            print('M, W  or * will not be recodonised')
             recodonised_sequence += current_codon
+            print('recodonised_sequence:')
+            print(recodonised_sequence)
             
         else:
-            ##print(aa, current_codon)
             aa_dict = {codon : codon_usage_table[codon] for codon in aa_to_codon[aa]}
             codon_freq_list = sorted(aa_dict.items(), key=lambda x: x[1], reverse=True)
             print('Codon frequency list:')
             print(codon_freq_list)
             for i, codon_freq in enumerate(codon_freq_list):
+                new_codon = ''
                 if (codon_freq[0] == current_codon) and (i == 0):
-                    recodonised_sequence += codon_freq_list[1][0]  # lower down a 
+                    new_codon = codon_freq_list[1][0] 
+                    print('Recodonising down a rank. New codon:')
+                    print(new_codon)
+                    recodonised_sequence += new_codon # lower down a 
+                    print('recodonised_sequence:')
                     print(recodonised_sequence)
 
                 elif codon_freq[0] == current_codon:
-                    recodonised_sequence += codon_freq_list[i-1][0]  # upper a rank
+                    new_codon = codon_freq_list[i-1][0]
+                    print('Recodonising up a rank. New codon:')
+                    print(new_codon)
+                    recodonised_sequence += new_codon  # up a rank
+                    print('recodonised_sequence:')
                     print(recodonised_sequence)
                     
     print(f'recodonised sequence (length:{len(recodonised_sequence)})')
@@ -193,10 +202,8 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
     recodonised_sequence_translation = translate(recodonised_sequence)
     print(recodonised_sequence_translation)
     
-    if aa_sequence == recodonised_sequence_translation:
-        print('Recodonised translations matches original translation')
-    else:
-        print('Recodonisation failed')
+    assert aa_sequence == recodonised_sequence_translation, "Recodonisation failed"
+    print("Recodonised translation matches original translation")
     
     # Now reattach the recodonised hdr region back to the hdr template
     # find region upstream to reattach to recodonised sequence. +n + 1 correct for the earlier frameshift correction
@@ -317,7 +324,7 @@ def generate_hdr_library(recodonised_hdr_template, spec_aa_codon_start, upstream
         print(aa_mutated_sequences)
 
         #add homology arms 
-        mutated_sequences_plus_homology_arms = [f"{upstream_homology_arm}_{sequence}_{downstream_homology_arm}" for sequence in mutated_sequences]
+        mutated_sequences_plus_homology_arms = [f"{upstream_homology_arm}{sequence}{downstream_homology_arm}" for sequence in mutated_sequences]
 
 
         return mutated_sequences_plus_homology_arms
