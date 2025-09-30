@@ -1,2 +1,2 @@
-# CRISPR-TAPE-2
- 
+# CORe Designer
+
