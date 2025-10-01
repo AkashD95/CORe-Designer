@@ -8,6 +8,7 @@ CORe designer is packaged into an easy-to-use graphical user interface that can 
 <LINK>
 
 The CORe designer GUI has two main windows:
+
 Uniprot locus: 
 
 
