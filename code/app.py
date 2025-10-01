@@ -525,8 +525,6 @@ class MainApp(QtWidgets.QMainWindow):
         upstream_guide_distance = int(upstream_guide['Upstream guide RNA Distance from Amino Acid (bp)'])
         downstream_guide_distance = int(downstream_guide['Downstream guide RNA Distance from Amino Acid (bp)'])
         
- 
-        
         try:
             #Get codon usage table and process into dictionary
             codon_usage_table_file = self.selected_codon_usage_table
@@ -560,6 +558,7 @@ class MainApp(QtWidgets.QMainWindow):
             #Generate hdr_library for target of interest
             #Take the top frequency codon for each amino acid subsitution
             codon_usage_table_sorted = codon_usage_table.sort_values(['Amino_Acid', 'Frequency'], ascending=[True, False])
+            
             # Keep the first row for each AminoAcid (highest frequency)
             top_codon = codon_usage_table_sorted.groupby('Amino_Acid', as_index=False).first()
             top_codon_list = list(zip(top_codon['Amino_Acid'], top_codon['Codon']))
@@ -577,8 +576,6 @@ class MainApp(QtWidgets.QMainWindow):
             QMessageBox.critical(None, "Error", f"An error occurred and information has been logged.")
             return
 
-
-        
         # Update the results table
         QMessageBox.information(None, "HDR template generated", "Click OK to add the information to the results table.")
         self.populate_results_table(genomic_information_loci_extracted_plus_guides_plus_hdr)
@@ -756,7 +753,6 @@ class MainApp(QtWidgets.QMainWindow):
             logging.error("An error occurred during primer design", exc_info=True)
             QMessageBox.critical(None, "Error", f"An error occurred and information has been logged.")
             return
-        
         self.populate_results_table_custom(genomic_information_loci_extracted_plus_guides_plus_hdr_plus_primers)
         
 
@@ -782,12 +778,25 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Open a file dialog to choose the file location
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Excel File",
+            "",
+            "Excel Files (*.xlsx);;All Files (*)",
+            options=options
+        )
 
         if file_name:
-            # Save the DataFrame to a CSV file
-            df.to_csv(file_name, index=False)
-            print(f"Data saved to {file_name}")
+            # Ensure .xlsx extension
+            if not file_name.lower().endswith(".xlsx"):
+                file_name += ".xlsx"
+
+            try:
+                # Save the DataFrame to an Excel file
+                df.to_excel(file_name, index=False, engine="openpyxl")
+                print(f"Data saved to {file_name}")
+            except Exception as e:
+                print(f"Error saving Excel file: {e}")
         
         QMessageBox.information(None, "Saving hdr library table", "Click OK to select save location.")
 
@@ -810,12 +819,25 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Open a file dialog to choose the file location
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Excel File",
+            "",
+            "Excel Files (*.xlsx);;All Files (*)",
+            options=options
+        )
 
         if file_name:
-            # Save the DataFrame to a CSV file
-            df.to_csv(file_name, index=False)
-            print(f"Data saved to {file_name}")
+            # Ensure .xlsx extension
+            if not file_name.lower().endswith(".xlsx"):
+                file_name += ".xlsx"
+
+            try:
+                # Save the DataFrame to an Excel file
+                df.to_excel(file_name, index=False, engine="openpyxl")
+                print(f"Data saved to {file_name}")
+            except Exception as e:
+                print(f"Error saving Excel file: {e}")
     
     def save_action_custom(self):
         """Save the contents of the results_table to a CSV file."""
@@ -841,12 +863,25 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Open a file dialog to choose the file location
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Excel File",
+            "",
+            "Excel Files (*.xlsx);;All Files (*)",
+            options=options
+        )
 
         if file_name:
-            # Save the DataFrame to a CSV file
-            df.to_csv(file_name, index=False)
-            print(f"Data saved to {file_name}")
+            # Ensure .xlsx extension
+            if not file_name.lower().endswith(".xlsx"):
+                file_name += ".xlsx"
+
+            try:
+                # Save the DataFrame to an Excel file
+                df.to_excel(file_name, index=False, engine="openpyxl")
+                print(f"Data saved to {file_name}")
+            except Exception as e:
+                print(f"Error saving Excel file: {e}")
         
         """Save the contents of the results_table to a CSV file."""
         QMessageBox.information(None, "Saving hdr library table", "Click OK to select save location.")
@@ -870,12 +905,25 @@ class MainApp(QtWidgets.QMainWindow):
 
         # Open a file dialog to choose the file location
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Excel File",
+            "",
+            "Excel Files (*.xlsx);;All Files (*)",
+            options=options
+        )
 
         if file_name:
-            # Save the DataFrame to a CSV file
-            df.to_csv(file_name, index=False)
-            print(f"Data saved to {file_name}")
+            # Ensure .xlsx extension
+            if not file_name.lower().endswith(".xlsx"):
+                file_name += ".xlsx"
+
+            try:
+                # Save the DataFrame to an Excel file
+                df.to_excel(file_name, index=False, engine="openpyxl")
+                print(f"Data saved to {file_name}")
+            except Exception as e:
+                print(f"Error saving Excel file: {e}")
 
     def reset_action(self):
         """Reset the entire application to its initial state."""
