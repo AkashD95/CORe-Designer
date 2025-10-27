@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 
 #Class for pop up table needed for guide RNA selection
-class PopUpTable(QDialog):
+class PopUpTableGuides(QDialog):
     def __init__(self, df, parent=None):
         '''
         Pop-up table for selecting guide RNAs.
@@ -70,6 +70,63 @@ class PopUpTable(QDialog):
         
         # Retrieve data for each selected row
         self.selected_guides = [
+            [self.table.item(row, col).text() for col in range(self.table.columnCount())]
+            for row in selected_rows
+        ]
+        self.accept()  # Close the dialog
+
+class PopUpTableLoci(QDialog):
+    def __init__(self, df, parent=None):
+        '''
+        Pop-up table for selecting genomic loci
+
+        Args:
+            df (pd.DataFrame): DataFrame containing guide RNA information.
+            parent (QWidget, optional): Parent widget for the dialog.
+        '''
+
+        super().__init__(parent)
+        self.setWindowTitle("Select desired transcript ID.")
+        self.resize(400, 300)
+        
+        # Layout for the dialog
+        layout = QVBoxLayout(self)
+        
+        # Create the table
+        self.table = QTableWidget(self)
+        self.table.setRowCount(df.shape[0])  # Set number of rows
+        self.table.setColumnCount(df.shape[1])  # Set number of columns
+        self.table.setHorizontalHeaderLabels(df.columns.tolist())  # Set column headers
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setSelectionMode(QTableWidget.MultiSelection)  # Allow multiple selection
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        
+        # Fill the table with data from the DataFrame
+        for row_idx, row_data in df.iterrows():
+            for col_idx, value in enumerate(row_data):
+                self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
+        
+        layout.addWidget(self.table)
+        
+        # Add a select button
+        self.select_button = QPushButton("Select")
+        self.select_button.clicked.connect(self.get_selected_rows)
+        layout.addWidget(self.select_button)
+        
+        #Initialise variable
+        self.selected_genomic_information = None
+    
+    def get_selected_rows(self):
+        selected_items = self.table.selectedItems()
+        
+        # Organize selected items by rows
+        selected_rows = set(item.row() for item in selected_items)
+        if len(selected_rows) != 1:
+            QMessageBox.warning(self, "Selection Error", "Please select two guide RNAs.")
+            return
+        
+        # Retrieve data for each selected row
+        self.selected_genomic_information = [
             [self.table.item(row, col).text() for col in range(self.table.columnCount())]
             for row in selected_rows
         ]
@@ -386,6 +443,15 @@ class MainApp(QtWidgets.QMainWindow):
             print(amino_acid_position)
             genomic_information = extract_genomic_information_from_uniprot_id(uniprot_id)
             print(genomic_information)
+            QMessageBox.information(None, "Uniprot record found", "Select desired transcript ID from the pop up table. Press OK to continue.")
+            
+            genomic_information_pop_up = PopUpTableLoci(genomic_information, self)
+            if genomic_information_pop_up.exec_() == QDialog.Accepted:
+                selected_genomic_information = genomic_information_pop_up.selected_genomic_information
+                selected_genomic_information_df = pd.DataFrame(selected_genomic_information, columns=genomic_information.columns)
+
+            genomic_information = selected_genomic_information_df.reset_index(drop=True)
+
             genomic_information_loci_extracted = extract_genomic_loci_from_genomic_information(genomic_information,genome_sequence_records)
             print(genomic_information_loci_extracted)
             
@@ -411,8 +477,9 @@ class MainApp(QtWidgets.QMainWindow):
             return
 
         QMessageBox.information(None, "Guides are generated", "Select two guides from the pop up table. Press OK to continue.")
+        
         # Display the pop-up table at the end of this function
-        guide_pop_up = PopUpTable(guides, self)
+        guide_pop_up = PopUpTableGuides(guides, self)
         if guide_pop_up.exec_() == QDialog.Accepted:
             selected_guides = guide_pop_up.selected_guides
             selected_guide_df = pd.DataFrame(selected_guides, columns=guides.columns)
