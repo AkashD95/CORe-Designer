@@ -42,7 +42,8 @@ def test_recodonise_hdr_template(hdr_template, upstream_distance, downstream_dis
     recodonised_template, spec_codon_start, recodonisation_check = recodonise_hdr_template(
         hdr_template,
         upstream_distance,
-        downstream_distance
+        downstream_distance,
+        codon_usage_table = {'GGG': 669768, 'GGA': 669873, 'GGT': 437126, 'GGC': 903565, 'GAG': 1609975, 'GAA': 1177632, 'GAT': 885429, 'GAC': 1020595, 'GTG': 1143534, 'GTA': 287712, 'GTT': 448607, 'GTC': 588138, 'GCG': 299495, 'GCA': 643471, 'GCT': 750096, 'GCC': 1127679, 'AGG': 486463, 'AGA': 494682, 'AGT': 493429, 'AGC': 791383, 'AAG': 1295568, 'AAA': 993621, 'AAT': 689701, 'AAC': 776603, 'ATG': 896005, 'ATA': 304565, 'ATT': 650473, 'ATC': 846466, 'ACG': 246105, 'ACA': 614523, 'ACT': 533609, 'ACC': 768147, 'TGG': 535595, 'TGA': 63237, 'TGT': 430311, 'TGC': 513028, 'TAG': 32109, 'TAA': 40285, 'TAT': 495699, 'TAC': 622407, 'TTG': 525688, 'TTA': 311881, 'TTT': 714298, 'TTC': 824692, 'TCG': 179419, 'TCA': 496448, 'TCT': 618711, 'TCC': 718892, 'CGG': 464485, 'CGA': 250760, 'CGT': 184609, 'CGC': 423516, 'CAG': 1391973, 'CAA': 501911, 'CAT': 441711, 'CAC': 613713, 'CTG': 1611801, 'CTA': 290751, 'CTT': 536515, 'CTC': 796638, 'CCG': 281570, 'CCA': 688038, 'CCT': 713233, 'CCC': 804620}
     )
 
     # --- Check if recodonisation preserved sequence length ---
