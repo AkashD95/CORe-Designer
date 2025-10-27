@@ -16,9 +16,10 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
     integration_specific_primers (DataFrame): dataframe containing forward and reverse primer sequences and Tm's
     '''
     
-    #Make sure integration-specific primer falls within the exonic portion of the recodonised region
+    #Code to ensure that integration-specific primer falls within the exonic portion of the recodonised region
     exon_start_index = upstream_homology_arm_end
     upstream_primer_range = upstream_guide_distance
+    
     if loci_plus_recodonised_hdr_template[exon_start_index].islower():
         first_upper = next((i for i, char in enumerate(hdr_template_recodonised) if char.isupper()), -1)
         exon_start_index = first_upper + upstream_homology_arm_end
@@ -45,7 +46,7 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
 
     
     try: 
-        if(len(loci_plus_recodonised_hdr_template) - exon_end_index < 1000):
+        if (len(loci_plus_recodonised_hdr_template) - exon_end_index < 1000):
             downstream_primer_search_length = len(loci_plus_recodonised_hdr_template) - exon_end_index
         else:
             downstream_primer_search_length = 1000
@@ -95,9 +96,7 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
         print(right_primer_sequence)
         right_primer_tm = primers['PRIMER_RIGHT'][0]['TM']
         print(right_primer_tm)
-        right_primer_start = primers['PRIMER_RIGHT'][0]['COORDS'][0]
-        right_primer_len = primers['PRIMER_RIGHT'][0]['COORDS'][1]
-    
+        
         return left_primer_sequence, left_primer_tm, right_primer_sequence, right_primer_tm
     
     except ValueError as e:
@@ -148,14 +147,10 @@ def design_integration_specific_primers(hdr_template_recodonised, loci_plus_reco
         print(left_primer_sequence)
         left_primer_tm = primers['PRIMER_LEFT'][0]['TM']
         print(left_primer_tm)
-        left_primer_start = primers['PRIMER_LEFT'][0]['COORDS'][0]
-        left_primer_len = primers['PRIMER_LEFT'][0]['COORDS'][1]
-        
+    
         right_primer_sequence = primers['PRIMER_RIGHT'][0]['SEQUENCE']
         print(right_primer_sequence)
         right_primer_tm = primers['PRIMER_RIGHT'][0]['TM']
         print(right_primer_tm)
-        right_primer_start = primers['PRIMER_RIGHT'][0]['COORDS'][0]
-        right_primer_len = primers['PRIMER_RIGHT'][0]['COORDS'][1]
-
+        
         return left_primer_sequence, left_primer_tm, right_primer_sequence, right_primer_tm

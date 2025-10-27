@@ -7,14 +7,15 @@ Quick Start
 CORe designer is packaged into an easy-to-use graphical user interface that can be found by following the link below:
 <LINK>
 
-The CORe designer GUI has two main windows:
-
+CORe designer GUI has two main windows:
 Uniprot locus: 
 Use this tab if you are working with a protein that has the genomic coordinates associated with it on Uniprot.
 
-
 Custom locus: 
 Use this this tab if the protein does not have genomic coordinates associated with it on Uniprot
+
+Testing:
+All tests are written under the pytest framework. To run them, navigate to code/test/ and run pytest in the console.
 
 License and distribution
 We want CORe Designer to be iterated and improved, so all code is under the GNU General Public Licence. Please modify and use any code that is useful to you and email us if you want to collaborate. 

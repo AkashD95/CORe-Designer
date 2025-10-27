@@ -1,6 +1,6 @@
 from app_utils import translate, clean_loci
 
-def generate_hdr_template(loci, upstream_guide_position, downstream_guide_position, homology_overlap = 100):
+def generate_hdr_template(loci, upstream_guide_position, downstream_guide_position, homology_overlap):
     """
     Finds the sequence between two guide RNA sequences in a genomic loci and adds an homology overlap.
     
@@ -58,9 +58,9 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
     # 2 dictionaries to be used by the function
     # codon_dict pairs each codon to the corresponding amino acid
     codon_dict = {
-    'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
-    'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R', 'AGA': 'R', 'AGG': 'R',
-    'AAT': 'N', 'AAC': 'N',
+    'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A', 
+    'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R', 'AGA': 'R', 'AGG': 'R', 
+    'AAT': 'N', 'AAC': 'N', 
     'GAT': 'D', 'GAC': 'D',
     'TGT': 'C', 'TGC': 'C',
     'GAA': 'E', 'GAG': 'E',
@@ -263,7 +263,7 @@ def reconstruct_loci_with_recodonised_hdr_template(loci, hdr_template_recodonise
     
 def generate_hdr_library(recodonised_hdr_template, spec_aa_codon_start, upstream_homology_arm, downstream_homology_arm, variant_specific = None, codon_list = [('I', 'ATC'), ('M', 'ATG'), ('T', 'ACC'), ('N', 'AAC'), ('K', 'AAG'), ('S', 'AGC'), ('R', 'CGG'), ('L', 'CTG'), ('P', 'CCC'), ('H', 'CAC'), ('Q', 'CAG'), ('V', 'GTG'), ('A', 'GCC'), ('D', 'GAC'), ('E', 'GAG'), ('G', 'GGC'), ('F', 'TTC'), ('Y', 'TAC'), ('C', 'TGC'), ('W', 'TGG'), ('*', 'TAA')]):
         '''
-        Replaces a codon at a given index
+        Replaces a codon at a given index with codons of the highest frequency in a given organism.
         Arguments:
         hdr_template (str) - homologous directed repair template 
         spec_aa_codon_start (int) - start index of codon to be replaced 
