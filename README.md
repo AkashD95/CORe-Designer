@@ -15,7 +15,7 @@ Custom locus:
 Use this this tab if the protein does not have genomic coordinates associated with it on Uniprot
 
 Testing:
-All tests are written under the pytest framework. To run them, navigate to code/test/ and run pytest in the console.
+All tests are written under the pytest framework. To run them, navigate to code/tests/ and run pytest in the console.
 
 License and distribution
 We want CORe Designer to be iterated and improved, so all code is under the GNU General Public Licence. Please modify and use any code that is useful to you and email us if you want to collaborate. 
