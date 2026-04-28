@@ -58,51 +58,51 @@ def recodonise_hdr_template(hdr_template, upstream_guide_distance, downstream_gu
     # 2 dictionaries to be used by the function
     # codon_dict pairs each codon to the corresponding amino acid
     codon_dict = {
-    'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A', 
-    'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R', 'AGA': 'R', 'AGG': 'R', 
-    'AAT': 'N', 'AAC': 'N', 
-    'GAT': 'D', 'GAC': 'D',
-    'TGT': 'C', 'TGC': 'C',
-    'GAA': 'E', 'GAG': 'E',
-    'CAA': 'Q', 'CAG': 'Q',
-    'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G',
-    'CAT': 'H', 'CAC': 'H',
-    'ATT': 'I', 'ATC': 'I', 'ATA': 'I',
-    'TTA': 'L', 'TTG': 'L', 'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
-    'AAA': 'K', 'AAG': 'K',
-    'ATG': 'M',  
-    'TTT': 'F', 'TTC': 'F',
-    'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
-    'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S', 'AGT': 'S', 'AGC': 'S',
-    'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T',
-    'TGG': 'W',
-    'TAT': 'Y', 'TAC': 'Y',
-    'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V',
-    'TAA': '*', '*': '*', 'TGA': '*'
+    'GCA': 'A', 'GCC': 'A', 'GCG': 'A', 'GCT': 'A',  # Alanine
+    'TGC': 'C', 'TGT': 'C', # Cysteine
+    'GAC': 'D', 'GAT': 'D', # Aspartic Acid
+    'GAA': 'E', 'GAG': 'E', # Glutamic Acid 
+    'TTC': 'F', 'TTT': 'F', # Phenylalanine
+    'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G', # Glycine
+    'CAC': 'H', 'CAT': 'H', # Histidine 
+    'ATA': 'I', 'ATC': 'I', 'ATT': 'I', # Isoleucine
+    'AAA': 'K', 'AAG': 'K', # Lysine
+    'CTA': 'L', 'CTC': 'L', 'CTG': 'L', 'CTT': 'L','TTA': 'L', 'TTG': 'L', # Leucine 
+    'ATG': 'M', # Methionine  
+    'AAC': 'N', 'AAT': 'N', # Asparginine 
+    'CCA': 'P', 'CCC': 'P', 'CCG': 'P', 'CCT': 'P', # Proline
+    'CAA': 'Q', 'CAG': 'Q', # Glutamine
+    'AGA': 'R', 'AGG': 'R','CGA': 'R', 'CGC': 'R', 'CGG': 'R', 'CGT': 'R',  # Arginine
+    'AGT': 'S', 'AGC': 'S','TCA': 'S', 'TCC': 'S', 'TCG': 'S', 'TCT': 'S', # Serine
+    'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACT': 'T', # Threonine
+    'GTA': 'V', 'GTC': 'V', 'GTG': 'V', 'GTT': 'V', # Valine
+    'TGG': 'W', # Trytophan
+    'TAC': 'Y', 'TAT': 'Y', # Tyrosine
+    'TAA': '*', 'TAG': '*', 'TGA': '*' #Stop codons
     }
 
     #aa_to_codon pairs each amino acid to a codon
-    aa_to_codon = {
-    'I': ['ATA', 'ATC', 'ATT'], # Isoleucine
-    'M': ['ATG'], # Methionine
-    'T': ['ACA', 'ACC', 'ACG', 'ACT'], #Threonine
-    'N': ['AAC', 'AAT'], # Asparginine 
-    'K': ['AAA', 'AAG'], #Lysine
-    'S': ['AGC', 'AGT', 'TCA', 'TCC', 'TCG', 'TCT'],  # Serine
-    'R': ['AGA', 'AGG', 'CGA', 'CGC', 'CGG', 'CGT'],  # Arginine
-    'L': ['CTA', 'CTC', 'CTG', 'CTT', 'TTA', 'TTG'], # Leucine
-    'P': ['CCA', 'CCC', 'CCG', 'CCT'], # Proline
-    'H': ['CAC', 'CAT'], # Histidine 
-    'Q': ['CAA', 'CAG'], # Gluatmine
-    'V': ['GTA', 'GTC', 'GTG', 'GTT'], # Valine
+    aa_to_codon = {    
     'A': ['GCA', 'GCC', 'GCG', 'GCT'], # Alanine
+    'C': ['TGC', 'TGT'], # Cysteine
     'D': ['GAC', 'GAT'], # Aspartic Acid
     'E': ['GAA', 'GAG'], # Glutamic Acid 
-    'G': ['GGA', 'GGC', 'GGG', 'GGT'], # Glycine
     'F': ['TTC', 'TTT'], #Phenylalanine
-    'Y': ['TAC', 'TAT'], #Tyrosine
-    'C': ['TGC', 'TGT'], #Cysteine
+    'G': ['GGA', 'GGC', 'GGG', 'GGT'], # Glycine
+    'H': ['CAC', 'CAT'], # Histidine 
+    'I': ['ATA', 'ATC', 'ATT'], # Isoleucine
+    'K': ['AAA', 'AAG'], # Lysine
+    'L': ['CTA', 'CTC', 'CTG', 'CTT', 'TTA', 'TTG'], # Leucine
+    'M': ['ATG'], # Methionine
+    'N': ['AAC', 'AAT'], # Asparginine 
+    'P': ['CCA', 'CCC', 'CCG', 'CCT'], # Proline
+    'Q': ['CAA', 'CAG'], # Glutamine
+    'R': ['AGA', 'AGG', 'CGA', 'CGC', 'CGG', 'CGT'],  # Arginine
+    'S': ['AGC', 'AGT', 'TCA', 'TCC', 'TCG', 'TCT'],  # Serine
+    'T': ['ACA', 'ACC', 'ACG', 'ACT'], #Threonine
+    'V': ['GTA', 'GTC', 'GTG', 'GTT'], # Valine
     'W': ['TGG'], #Tryptophan
+    'Y': ['TAC', 'TAT'], #Tyrosine
     '*': ['TAA', 'TAG', 'TGA']  # Stop codons
 }
     

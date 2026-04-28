@@ -455,6 +455,9 @@ class MainApp(QtWidgets.QMainWindow):
             genomic_information_loci_extracted = extract_genomic_loci_from_genomic_information(genomic_information,genome_sequence_records)
             print(genomic_information_loci_extracted)
             
+            #Add amino acid position to this dataframe
+            genomic_information_loci_extracted['Amino_acid_position'] = amino_acid_position
+
             #Extract the loci to run through the guide RNA screen
             loci = genomic_information_loci_extracted['genomic_loci'].iloc[0]
             self.loci = loci #create class variable to be used in other functions
@@ -514,7 +517,6 @@ class MainApp(QtWidgets.QMainWindow):
         QMessageBox.information(None, "Starting the guide generation process", "Click OK to continue (this may take a couple of minutes), a table with generated guides for selection will pop up after this process is complete.")
         try:
             amino_acid_position = self.saved_text_amino_acid_position
-            
             #Extract the loci to run through the guide RNA screen
             loci = self.saved_text_custom_locus
             self.loci = loci #create class variable to be used in other functions
