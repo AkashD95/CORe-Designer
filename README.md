@@ -1,25 +1,29 @@
 # CORe Designer
-Contacts: Dr Akashaditya Das (akashaditya.das13@imperial.ac.uk)
 
-This CORe Designer repository contains all the code required to run CORe Designer from the terminal and package it for distribution. CORe designer offers a protein-centric approach for the generation of guide RNAs for CRISPR mutagenesis studies. Also included is the generation of homology-directed repair templates and integration-specific primer designs to follow the CORe methodology developed by the Child Lab at Imperial College London.
+CORe Designer offers a protein-centric approach for the generation of guide RNAs (gRNAs) for CRISPR mutagenesis studies. It also supports the generation of homology-directed repair (HDR) templates and integration-specific primer designs, following the **CORe methodology** developed by the **Child Lab at Imperial College London**.
 
-Quick Start:
-CORe designer is packaged into an easy-to-use graphical user interface that can be found by following the link below:
-<LINK>
+This repository contains all the code required to run CORe Designer from the terminal and package it for distribution.
 
-CORe designer GUI has two main windows:
-Uniprot locus: 
-Use this tab if you are working with a protein that has the genomic coordinates associated with it on Uniprot.
+---
 
-Custom locus: 
-Use this this tab if the protein does not have genomic coordinates associated with it on Uniprot
+## 🚀 Quick Start
 
-Testing:
-All tests are written under the pytest framework. To run them, navigate to code/tests/ and run pytest in the console.
+For most users, CORe Designer is packaged into an easy-to-use **Graphical User Interface (GUI)**. You can access the application directly via the link below:
 
-License and distribution
-We want CORe Designer to be iterated and improved, so all code is under the GNU General Public Licence. Please modify and use any code that is useful to you and email us if you want to collaborate. 
+👉 **[Access the CORe Designer GUI Here](INSERT_LINK_HERE)**
 
+### GUI Features & Navigation
+The interface is split into two main operational windows depending on your input data:
 
+* **Uniprot Locus Tab:** Use this tab if you are working with a protein that already has genomic coordinates associated with it on UniProt.
+* **Custom Locus Tab:** Use this tab if your target protein does not have pre-associated genomic coordinates on UniProt.
 
+---
 
+## 🧪 Testing
+
+All tests for this project are written using the `pytest` framework. To run the test suite locally, navigate to the test directory and run the console command:
+
+```bash
+cd code/tests/
+pytest
