@@ -8,9 +8,7 @@ This repository contains all the code required to run CORe Designer from the ter
 
 ## 🚀 Quick Start
 
-For most users, CORe Designer is packaged into an easy-to-use **Graphical User Interface (GUI)**. You can access the application directly via the link below:
-
-👉 **[Access the CORe Designer GUI Here](INSERT_LINK_HERE)**
+For most users, CORe Designer is packaged into an easy-to-use **Graphical User Interface (GUI)**. You can access the application directly via the releases sidebar on this Github.
 
 ### GUI Features & Navigation
 The interface is split into two main operational windows depending on your input data:
