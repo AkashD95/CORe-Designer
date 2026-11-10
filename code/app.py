@@ -6,7 +6,7 @@ from ui.CORe_designer import Ui_MainWindow  # Import the generated UI class
 from app_uniprot_id_to_genomic_loci_to_guide_generation import extract_genomic_information_from_uniprot_id, extract_genomic_loci_from_genomic_information,find_guides, get_codon_index, get_GC_content, guide_RNA_notes, specific_function_guide_RNA_generation
 from app_selected_guides_to_hdr_template import generate_hdr_template, recodonise_hdr_template, reconstruct_loci_with_recodonised_hdr_template, generate_hdr_library
 from app_integration_specific_primers import design_integration_specific_primers
-from app_utils import extract_genome_multifast_to_list_of_sequence_records
+from app_utils import extract_genome_multifasta_to_list_of_sequence_records
 import time
 import logging
 
@@ -432,7 +432,7 @@ class MainApp(QtWidgets.QMainWindow):
         # Convert the file into a list of genomic records 
         QMessageBox.information(None, "Starting the guide generation process", "Click OK to continue (this may take a couple of minutes), a table with generated guides for selection will pop up after this process is complete.")
         try:
-            genome_sequence_records = extract_genome_multifast_to_list_of_sequence_records(self.selected_reference_genome)
+            genome_sequence_records = extract_genome_multifasta_to_list_of_sequence_records(self.selected_reference_genome)
             print('genome sequence records:')
             print(genome_sequence_records)
             uniprot_id = self.saved_text_uniprot_id

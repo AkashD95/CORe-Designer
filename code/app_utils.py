@@ -82,7 +82,6 @@ def translate(dna_seq):
 
     # Iterate over the DNA sequence in steps of 3 (codon length)
     for i in range(0, len(dna_seq) - len(dna_seq) % 3, 3):
-        
         # Define a codon as 3 bases
         codon = dna_seq[i:i + 3]
         # Translate the codon into an amino acid based on the dictionary
@@ -93,16 +92,17 @@ def translate(dna_seq):
 
     return protein
 
-def extract_genome_multifast_to_list_of_sequence_records(genome_multi_fasta):
-    '''
+def extract_genome_multifasta_to_list_of_sequence_records(genome_multi_fasta):
+    """
     Takes in genomic multi fasta input and list of sequence records out 
 
     Args:
-    genome_multi_fasta(fasta): multi fasta containing sequence records for a genome
+    genome_multi_fasta(str): path to multi fasta containing sequence records for a genome
 
     Returns:
     genome_sequence_records(list): list of sequences in biopython seqRecord format
-    '''
+    """
+    
     print('Starting genome extraction...')
     genome_sequence_records = []
     for record in SeqIO.parse(genome_multi_fasta, "fasta"):

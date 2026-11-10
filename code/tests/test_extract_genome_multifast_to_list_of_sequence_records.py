@@ -1,6 +1,6 @@
 import pytest
 from Bio.SeqRecord import SeqRecord
-from app_utils import extract_genome_multifast_to_list_of_sequence_records  # Replace with your actual module
+from app_utils import extract_genome_multifasta_to_list_of_sequence_records  
 
 @pytest.mark.parametrize(
     "fasta_content, expected_ids, expected_seqs",
@@ -15,13 +15,13 @@ GCTAGCTAGCTAACGT""",
         ),
     ]
 )
-def test_extract_genome_multifast_to_list_of_sequence_records(tmp_path, fasta_content, expected_ids, expected_seqs):
+def test_extract_genome_multifasta_to_list_of_sequence_records(tmp_path, fasta_content, expected_ids, expected_seqs):
     # Create a temporary FASTA file
     fasta_file = tmp_path / "test.fasta"
     fasta_file.write_text(fasta_content)
 
     # Call the function with the temp file
-    records = extract_genome_multifast_to_list_of_sequence_records(str(fasta_file))
+    records = extract_genome_multifasta_to_list_of_sequence_records(str(fasta_file))
 
     # Assertions
     assert isinstance(records, list)
